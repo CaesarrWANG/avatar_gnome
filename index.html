@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GNM Avatar · 单目视频 3D Talking Head 重建</title>
+<meta name="description" content="基于 Google GNM Head 参数化模型的单目视频 3D talking head 重建：模型内部细节、重建方法与结果演示。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0d12;--bg2:#10131a;--panel:#161a23;--panel2:#1c2130;--line:#262c3a;
+  --text:#e8ebf1;--muted:#9aa3b5;--accent:#5eead4;--accent2:#f59e0b;--accent3:#818cf8;
+  --radius:16px;--maxw:1180px;
+  --sans:"Inter","Noto Sans SC",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+img,video{max-width:100%;display:block}
+code,pre{font-family:var(--mono);font-size:.88em}
+code{background:#20263a;padding:.1em .4em;border-radius:6px;color:#c7d2fe}
+pre{background:#0d1017;border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow:auto;line-height:1.5}
+pre code{background:none;padding:0;color:#d6dbe6}
+h1,h2,h3,h4{line-height:1.25;margin:0 0 .5em;font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(26px,3.2vw,36px)}
+h3{font-size:20px}
+h4{font-size:16px;color:var(--accent)}
+p{margin:0 0 1em}
+.muted{color:var(--muted)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(11,13,18,.72);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:22px;height:58px}
+nav .brand{font-weight:800;letter-spacing:.02em;color:var(--text);display:flex;align-items:center;gap:10px}
+nav .brand i{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent3));display:inline-block}
+nav ul{list-style:none;display:flex;gap:4px;margin:0 0 0 auto;padding:0}
+nav li a{display:block;padding:6px 12px;border-radius:999px;color:var(--muted);font-size:14px;font-weight:500}
+nav li a:hover,nav li a.active{color:var(--text);background:var(--panel2);text-decoration:none}
+@media(max-width:760px){nav ul{display:none}}
+
+/* hero */
+.hero{position:relative;overflow:hidden;padding:88px 0 64px;border-bottom:1px solid var(--line);
+  background:radial-gradient(900px 420px at 18% -10%,rgba(94,234,212,.16),transparent 60%),
+             radial-gradient(700px 400px at 90% 10%,rgba(129,140,248,.18),transparent 60%),var(--bg)}
+.hero .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
+@media(max-width:900px){.hero .grid{grid-template-columns:1fr}}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:18px}
+.eyebrow::before{content:"";width:28px;height:2px;background:var(--accent)}
+.hero h1{font-size:clamp(34px,5vw,56px);font-weight:800;margin-bottom:18px}
+.hero h1 span{background:linear-gradient(90deg,var(--accent),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{font-size:18px;color:var(--muted);max-width:620px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:30px}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:rgba(22,26,35,.8);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.stat b{display:block;font-size:26px;font-weight:800;letter-spacing:-.02em}
+.stat span{font-size:13px;color:var(--muted)}
+.hero-media{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);background:#000}
+.hero-media video{width:100%;aspect-ratio:1/1;object-fit:cover}
+.hero-media figcaption{padding:10px 14px;font-size:13px;color:var(--muted);background:var(--panel)}
+
+/* sections */
+section{padding:84px 0}
+section + section{border-top:1px solid var(--line)}
+.sec-head{display:grid;grid-template-columns:auto 1fr;gap:18px 26px;align-items:end;margin-bottom:40px}
+.sec-head .num{font-family:var(--mono);color:var(--accent2);font-size:14px;letter-spacing:.2em;align-self:start;padding-top:10px}
+.sec-head p{color:var(--muted);max-width:760px;margin:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px}
+.card h3{margin-top:0}
+.cards{display:grid;gap:18px}
+.cards.c2{grid-template-columns:repeat(2,1fr)}
+.cards.c3{grid-template-columns:repeat(3,1fr)}
+.cards.c4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:960px){.cards.c3,.cards.c4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.cards.c2,.cards.c3,.cards.c4{grid-template-columns:1fr}}
+.figure{margin:0 0 28px}
+.figure img{width:100%;border-radius:12px;border:1px solid var(--line);cursor:zoom-in;background:#000}
+.figure figcaption{font-size:14px;color:var(--muted);margin-top:10px}
+.figure figcaption b{color:var(--text)}
+.sub{margin:48px 0 18px;display:flex;align-items:center;gap:14px}
+.sub h3{margin:0}
+.sub::after{content:"";flex:1;height:1px;background:var(--line)}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#1f2a3a;color:var(--accent);border:1px solid #27405a;vertical-align:middle}
+.pill.amber{color:var(--accent2);background:#2b2416;border-color:#4a3a17}
+.pill.violet{color:#c7d2fe;background:#232745;border-color:#3b3f78}
+
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+
+.formula{font-family:var(--mono);background:#0d1017;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:14px 18px;margin:12px 0 18px;overflow:auto;font-size:15px;color:#dfe5f1}
+.formula small{display:block;color:var(--muted);font-family:var(--sans);font-size:13px;margin-top:6px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:14.5px}
+.kv dt{color:var(--muted);font-family:var(--mono);font-size:13px;white-space:nowrap}
+.kv dd{margin:0}
+ul.tight{margin:.2em 0 .6em;padding-left:1.2em}
+ul.tight li{margin:.25em 0}
+
+/* flow diagram */
+.flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:8px 0 30px}
+@media(max-width:960px){.flow{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.flow{grid-template-columns:repeat(2,1fr)}}
+.step{position:relative;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:16px 14px 14px}
+.step .n{font-family:var(--mono);font-size:12px;color:var(--accent2);margin-bottom:6px}
+.step b{display:block;font-size:15px;margin-bottom:4px}
+.step span{font-size:13px;color:var(--muted);line-height:1.45;display:block}
+.step::after{content:"→";position:absolute;right:-13px;top:46%;color:var(--line);font-size:18px;z-index:1}
+.step:last-child::after{content:""}
+
+/* video grid */
+.vgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+@media(max-width:760px){.vgrid{grid-template-columns:1fr}}
+.vcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.vcard video{width:100%;aspect-ratio:3/1;background:#000}
+.vcard .meta{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;font-size:13.5px}
+.vcard .meta b{font-weight:600}
+.vcard .meta span{color:var(--muted);font-family:var(--mono);font-size:12.5px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted);margin:0 0 18px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.turn{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:760px){.turn{grid-template-columns:1fr}}
+.turn video{width:100%;aspect-ratio:1/1;border-radius:12px;border:1px solid var(--line);background:#000}
+
+/* tabs */
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.tabs button{background:none;border:none;color:var(--muted);font:inherit;font-weight:600;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.active{color:var(--text);border-bottom-color:var(--accent)}
+.tabpanel{display:none}.tabpanel.active{display:block}
+
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:0 18px;margin:10px 0}
+details summary{cursor:pointer;padding:14px 0;font-weight:600;list-style:none;display:flex;align-items:center;gap:10px}
+details summary::before{content:"+";font-family:var(--mono);color:var(--accent);width:16px}
+details[open] summary::before{content:"–"}
+details .body{padding:0 0 16px;color:var(--muted);font-size:14.5px}
+
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+
+footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media(max-width:760px){footer .wrap{grid-template-columns:1fr}}
+
+/* lightbox */
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:100;cursor:zoom-out;padding:24px}
+#lb.open{display:flex}
+#lb img{max-width:96vw;max-height:92vh;border-radius:10px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><i></i>GNM Avatar</a>
+    <ul>
+      <li><a href="#overview">概览</a></li>
+      <li><a href="#gnm">GNM 模型</a></li>
+      <li><a href="#method">重建方法</a></li>
+      <li><a href="#results">结果演示</a></li>
+      <li><a href="#limits">局限与展望</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap grid">
+    <div>
+      <div class="eyebrow">Monocular video → 3D talking head</div>
+      <h1>基于 <span>GNM Head</span> 的<br>单目视频 3D Talking Head 重建</h1>
+      <p class="lead">用 Google 开源的参数化头部模型 GNM（Generative aNthropometric Model）作为几何先验，从单目说话视频中联合求解身份、逐帧表情与头部姿态，再从视频中烘焙个性化纹理，得到可驱动、可渲染、可导出的 3D 说话人头像。</p>
+      <div class="stats">
+        <div class="stat"><b>17,821</b><span>网格顶点 / 17,662 四边面</span></div>
+        <div class="stat"><b>253 + 383</b><span>身份 + 表情参数维度</span></div>
+        <div class="stat"><b>9,751</b><span>已重建帧数（17 段视频）</span></div>
+        <div class="stat"><b>4.6 px</b><span>平均关键点重投影误差 @512²</span></div>
+      </div>
+    </div>
+    <figure class="hero-media">
+      <video src="assets/video/turntable_actor24.mp4" autoplay muted loop playsinline poster="assets/img/turntable_actor24_poster.jpg"></video>
+      <figcaption>RAVDESS Actor_24：拟合几何 + 从视频烘焙的 UDIM 纹理，360° 旋转展示</figcaption>
+    </figure>
+  </div>
+</header>
+
+<!-- ============ OVERVIEW ============ -->
+<section id="overview">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">00 / 概览</div>
+      <div>
+        <h2>一句话概括</h2>
+        <p>视频 → 2D 关键点 → 在 GNM 参数空间里做带先验的联合优化 → 全分辨率网格 → 纹理烘焙 → 渲染 / OBJ 导出。整条流程不需要任何训练数据，只依赖 GNM 的统计先验与 68 点人脸关键点。</p>
+      </div>
+    </div>
+    <div class="flow reveal">
+      <div class="step"><div class="n">01</div><b>关键点检测</b><span>FAN (face-alignment) 逐帧 68 点 2D 关键点</span></div>
+      <div class="step"><div class="n">02</div><b>刚体初始化</b><span>鼻梁/眼角/眉毛子集求解姿态、平移与焦距</span></div>
+      <div class="step"><div class="n">03</div><b>联合优化</b><span>共享身份 + 逐帧表情/姿态，Adam 2000 步</span></div>
+      <div class="step"><div class="n">04</div><b>网格导出</b><span>全 17,821 顶点 LBS 前向，OBJ + 平滑法线</span></div>
+      <div class="step"><div class="n">05</div><b>纹理烘焙</b><span>UDIM 7 tile，深度可见性测试 + 多帧加权</span></div>
+      <div class="step"><div class="n">06</div><b>渲染演示</b><span>pyrender/EGL 叠加、灰底、贴图渲染，H.264 + 原音轨</span></div>
+    </div>
+    <figure class="figure reveal">
+      <img src="assets/img/pipeline_stages.jpg" alt="pipeline stages">
+      <figcaption>从左到右：<b>源帧</b> → <b>FAN 68 关键点</b> → <b>GNM 拟合叠加</b> → <b>拟合网格</b> → <b>烘焙纹理渲染</b> → <b>贴图头部回贴到视频</b>（RAVDESS Actor_24，视频 03，第 40 帧）。</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ GNM ============ -->
+<section id="gnm">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">01 / GNM 模型内部</div>
+      <div>
+        <h2>GNM Head 是什么</h2>
+        <p>GNM（<em>Generative aNthropometric Model</em>，Google，2026，<a href="https://arxiv.org/abs/2607.23687" target="_blank">arXiv 2607.23687</a>，<a href="https://github.com/google/GNM" target="_blank">github.com/google/GNM</a>）是一个线性 3DMM + 线性混合蒙皮（LBS）的人头统计模型，覆盖头部、眼球、牙齿牙龈和舌头，提供 numpy / PyTorch / JAX / TensorFlow 四种后端。我们使用 v3.0 head 变体（<code>gnm_head.npz</code>，53 MB）。</p>
+      </div>
+    </div>
+
+    <div class="cards c2 reveal">
+      <div class="card">
+        <h3>前向模型</h3>
+        <div class="formula">V(α, β, θ, t) = LBS( T + B<sub>id</sub>·α + B<sub>exp</sub>·β + C(θ),&nbsp; J(α), θ, W ) + t
+          <small>T 模板顶点；B<sub>id</sub>∈ℝ<sup>253×V×3</sup> 身份基；B<sub>exp</sub>∈ℝ<sup>383×V×3</sup> 表情基；C(θ)=R<sub>pc</sub>·vec(rot(θ)−I) 姿态修正（36→53,463）；J(α)=J<sub>0</sub>+B<sub>J</sub>·α 关节位置随身份变化；W∈ℝ<sup>4×V</sup> 蒙皮权重；θ 为 4 个关节的轴角旋转。</small>
+        </div>
+        <p class="muted">身份和表情都是<b>线性 PCA 基</b>，表情作用在绑定姿态（bind pose）上，然后经关节蒙皮。与 FLAME 相比，GNM 顶点数更多（17.8k vs 5k）、眼球/牙齿/舌头是模型的一部分、表情基按区域分块且维度更高。</p>
+      </div>
+      <div class="card">
+        <h3>关键数据一览</h3>
+        <dl class="kv">
+          <dt>vertices</dt><dd>17,821 顶点，17,662 四边面 / 35,324 三角面，米制单位，y 向上，面朝 +z</dd>
+          <dt>identity 253</dt><dd>head 170 + eyes 3 + teeth 80（<code>identity_names</code>）</dd>
+          <dt>expression 383</dt><dd>left_eye_region 100 + right_eye_region 100 + lower_face_region 150 + tongue 32（含 tongue_mean）+ pupils 1</dd>
+          <dt>joints 4</dt><dd>neck → head → {left_eye, right_eye}；<code>joint_regressor</code> 4×V 从顶点回归关节</dd>
+          <dt>skinning</dt><dd><code>skinning_weights</code> 4×17,821，<code>pose_correctives_regressor</code> 36×53,463</dd>
+          <dt>vertex groups</dt><dd>46 个语义顶点组（skin, hockey_mask, lips, eye_sockets, 各解剖区域…），6 个网格组件</dd>
+          <dt>UV</dt><dd>UDIM 7 tile（1001 皮肤 … 1007 舌头），quad / triangle 两套 UV</dd>
+          <dt>landmarks</dt><dd><code>head_sparse_68.txt</code>：68 点 iBUG 顺序，每点 3 个顶点 + 重心权重</dd>
+          <dt>semantic sampler</dt><dd>两个 CVAE 解码器：20 类表情、2×4 类身份，用于采样合理参数</dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="sub"><h3>模板与拓扑</h3><span class="pill">edge flow</span></div>
+    <figure class="figure reveal">
+      <img src="assets/img/gnm_template_views.jpg" alt="GNM template">
+      <figcaption>GNM 模板（α=β=θ=0），贴 GNM 自带的 edge-flow 纹理显示四边面布线：面部为环绕眼口的同心布线，适合表情形变；包含完整后脑、颈部和耳廓。</figcaption>
+    </figure>
+
+    <div class="sub"><h3>身份空间与表情空间</h3><span class="pill violet">semantic sampler</span></div>
+    <figure class="figure reveal">
+      <img src="assets/img/gnm_identity_samples.jpg" alt="identity samples">
+      <figcaption><b>身份采样：</b>由 IdentitySampler（条件 VAE 解码器）按性别 × 人群采样的 253 维身份系数，作用于模板。关节位置随身份一起变化（<code>joint_identity_basis</code>）。</figcaption>
+    </figure>
+    <figure class="figure reveal">
+      <img src="assets/img/gnm_expression_samples.jpg" alt="expression samples">
+      <figcaption><b>表情采样：</b>ExpressionSampler 的 20 个语义类中的 6 类。表情基按区域分块（左眼 / 右眼 / 下半脸 / 舌头 / 瞳孔），牙齿和舌头随之运动。注意系数是<b>原始 PCA 系数</b>，各分量尺度差异很大（首分量 1.0 ≈ 8 mm 位移），这对拟合时的正则化很关键。</figcaption>
+    </figure>
+
+    <div class="sub"><h3>骨骼、蒙皮与网格组件</h3><span class="pill amber">LBS</span></div>
+    <div class="cards c2 reveal">
+      <figure class="figure" style="margin:0">
+        <img src="assets/img/gnm_skinning_weights.jpg" alt="skinning weights">
+        <figcaption><b>蒙皮权重</b>（橙色 = 1，蓝色 = 0）：neck 关节带动颈部，head 关节带动整个头部，左右眼关节只控制眼球。重建时我们只优化 neck 关节的旋转作为头部姿态。</figcaption>
+      </figure>
+      <figure class="figure" style="margin:0">
+        <img src="assets/img/gnm_components.jpg" alt="mesh components">
+        <figcaption><b>网格组件</b>：皮肤（肤色）、左眼（绿）、右眼（蓝）、上牙龈（黄）、下牙龈（橙）、舌头（粉）。眼球分内层（巩膜/虹膜/瞳孔）与外层角膜，渲染时角膜默认剔除。</figcaption>
+      </figure>
+    </div>
+
+    <div class="sub"><h3>UV 布局与关键点定义</h3><span class="pill">UDIM</span></div>
+    <div class="cards c3 reveal">
+      <figure class="figure" style="margin:0">
+        <img src="assets/img/gnm_uv_edgeflow.jpg" alt="uv edgeflow">
+        <figcaption><b>皮肤 tile (1001)</b> 的 UV 展开（GNM 自带 4k edge-flow 图）。人脸位于中央，耳朵在两侧，顶部缺口为头顶接缝。</figcaption>
+      </figure>
+      <figure class="figure" style="margin:0">
+        <img src="assets/img/gnm_uv_udim.png" alt="udim tiles">
+        <figcaption><b>UDIM 7 tile</b>：1001 皮肤、1002/1003 左眼内/外、1004/1005 右眼内/外、1006 牙齿牙龈、1007 舌头。每 tile 可用不同分辨率，纹理文件命名 <code>texture.&lt;UDIM&gt;.png</code>。</figcaption>
+      </figure>
+      <figure class="figure" style="margin:0">
+        <img src="assets/img/gnm_landmarks68.jpg" alt="68 landmarks">
+        <figcaption><b>68 关键点定义</b>：每个关键点由 3 个顶点的重心坐标给出，顺序与 iBUG-68 一致（0 下颌左、8 下巴、27–30 鼻梁、36/45 外眼角、48/54 嘴角），可直接与 FAN 检测结果对应。</figcaption>
+      </figure>
+    </div>
+
+    <details class="reveal">
+      <summary>工程层面的注意事项（我们踩过的坑）</summary>
+      <div class="body">
+        <ul class="tight">
+          <li><code>GNM.__call__</code> 被 <code>enp.check_and_normalize_arrays</code> 装饰，会悄悄切断 PyTorch autograd。拟合时直接调用 <code>gnm_common</code> 中的 <code>vertex_positions_bind_pose / joint_positions_bind_pose / compute_pose_correctives / linear_blend_skinning</code>。</li>
+          <li>PyTorch 后端内部用 <code>torch.asarray</code> 创建索引张量且不带 device，需要 <code>torch.set_default_device('cuda')</code>；<code>prune_vertices</code> 要在 CPU 上做完再搬到 GPU。</li>
+          <li><code>gnm_utils.expression_sigmas</code> 是<b>基向量范数</b>（顶点单位），不是系数标准差；用它做正则会把表情压成 0。我们改用 ExpressionSampler 采样得到的逐分量 std 作为先验。</li>
+          <li>渲染器 <code>render_gnm</code> 默认乘一个蓝色顶点色，输出是线性色（输入 sRGB 的 2.2 次方）；贴图渲染需传白色顶点色、关闭 shading 并做 gamma 还原。</li>
+          <li>发布版 pyrender 没有 <code>shader_program.get_shader_path</code>，需要 monkeypatch；EGL 离屏渲染设置 <code>PYOPENGL_PLATFORM=egl</code>。</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ METHOD ============ -->
+<section id="method">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">02 / 重建方法</div>
+      <div>
+        <h2>基于关键点的联合优化拟合</h2>
+        <p>GNM 只提供模型，不提供视频拟合代码。我们实现了一套纯 PyTorch 的优化式重建：同一个人的所有视频帧共享一组身份系数和焦距，每帧单独求解表情、头部旋转与平移，用关键点重投影误差驱动，用 GNM 的统计先验约束。</p>
+      </div>
+    </div>
+
+    <div class="cards c3 reveal">
+      <div class="card">
+        <h4>① 关键点检测</h4>
+        <p>face-alignment 的 FAN（2D，SFD 检测器）逐帧输出 68 点，取最大人脸；H100 上约 55 fps。输出 <code>landmarks (N,68,2)</code> 与 <code>valid</code> 掩码。</p>
+      </div>
+      <div class="card">
+        <h4>② 相机与姿态参数化</h4>
+        <p>OpenCV 针孔相机，主点在图像中心，<b>焦距共享可学习</b>（对数参数化，初值 1800 px）。世界→相机固定为 diag(1,−1,−1)（GNM y 向上、面朝 +z）。头部姿态 = neck 关节轴角旋转 + 三维平移，初值把 hockey_mask 中心放到相机前 1 m。</p>
+      </div>
+      <div class="card">
+        <h4>③ 裁剪模型加速</h4>
+        <p>优化阶段用 <code>prune_vertices</code> 把 GNM 裁成只含 68 个关键点所依赖的 <b>204 个顶点</b>，5,276 帧联合优化 2,000 步仅需约 40 s；收敛后再用全模型前向导出 17,821 顶点网格。</p>
+      </div>
+    </div>
+
+    <div class="sub"><h3>优化目标</h3><span class="pill amber">Adam · 两阶段</span></div>
+    <div class="cards c2 reveal">
+      <div class="card">
+        <div class="formula">L = L<sub>lm</sub> + λ<sub>id</sub>‖α‖² + L<sub>exp</sub> + λ<sub>t</sub> Σ<sub>n</sub>‖Δ(β<sub>n</sub>/σ)‖² + λ<sub>p</sub> Σ<sub>n</sub>(‖Δθ<sub>n</sub>‖² + ‖Δt<sub>n</sub>‖²)
+          <small>L<sub>lm</sub>：按部位加权的关键点像素误差平方（归一化到图像尺度，对有效帧取平均）。L<sub>exp</sub> = mean((β/σ)² · w<sub>exp</sub>)，σ 为由语义采样器估计的逐分量先验标准差，眼部分量权重更高；舌头与瞳孔分量固定为 0（单目视频不可观测）。Δ 为同一视频相邻帧之差。</small>
+        </div>
+        <p><b>阶段 1（刚体，400 步）：</b>只用鼻梁、外眼角、眉毛这些受表情影响小的点，优化旋转、平移和焦距。<br><b>阶段 2（全量，2000 步）：</b>加入身份与逐帧表情，Adam + 余弦退火学习率。</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size:16px">权重设置</h3>
+        <div class="table-wrap" style="border:none;background:none">
+        <table>
+          <tr><th>项</th><th class="num">值</th><th>说明</th></tr>
+          <tr><td>关键点权重</td><td class="num">0.3 / 0.8 / 1.0 / 1.0 / 1.5</td><td>下颌 / 眉 / 鼻 / 眼 / 嘴；下颌线最不可靠，嘴最重要</td></tr>
+          <tr><td>λ<sub>id</sub></td><td class="num">1e-3</td><td>身份 L2</td></tr>
+          <tr><td>w<sub>exp</sub></td><td class="num">5e-4 / 2e-3</td><td>下半脸 / 眼部表情先验</td></tr>
+          <tr><td>λ<sub>t</sub></td><td class="num">1e-2</td><td>表情时域平滑</td></tr>
+          <tr><td>λ<sub>p</sub></td><td class="num">10</td><td>姿态与平移时域平滑</td></tr>
+          <tr><td>lr</td><td class="num">2e-2 / 3e-3 / 2e-3</td><td>身份&amp;表情 / 旋转 / 平移&amp;焦距</td></tr>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub"><h3>表情先验为什么重要</h3><span class="pill violet">σ from sampler</span></div>
+    <div class="card reveal">
+      <p>GNM 表情系数是未归一化的 PCA 系数，不同分量的典型幅度相差两个数量级（先验 std 最小 0.015、中位 0.24、最大 1.2）。最初用库里的 <code>expression_sigmas</code> 做正则，结果所有表情被压到接近 0，嘴永远闭着（误差 7.5 px）。改用从 <code>ExpressionSampler</code> 的 20 类 × 200 个样本估计的逐分量 RMS 作为 σ 后，嘴型、露齿、挑眉都能被正确拟合，误差降到 4.3 px。这个 σ 只需估计一次并缓存。</p>
+    </div>
+
+    <div class="sub"><h3>纹理烘焙</h3><span class="pill">UDIM bake</span></div>
+    <div class="cards c2 reveal">
+      <div class="card">
+        <ol style="margin:0;padding-left:1.2em">
+          <li style="margin:.3em 0"><b>UV 光栅化：</b>按 UDIM tile 把三角形光栅化到纹理空间（皮肤 2048²，其余 512²），得到每个纹素所属三角形与重心坐标，边缘略微外扩避免接缝。</li>
+          <li style="margin:.3em 0"><b>逐帧投影：</b>每 4 帧取一帧，用拟合参数前向出全网格，纹素 3D 位置投影到视频像素，双线性采样颜色。</li>
+          <li style="margin:.3em 0"><b>可见性：</b>pyrender 渲染深度图（去掉透明角膜），纹素深度与深度图差 &lt; 4 mm 且法线朝向相机才计入；权重 cos⁴θ。</li>
+          <li style="margin:.3em 0"><b>融合与补洞：</b>加权平均；从未观测到的纹素（后脑、口腔、颈下）用 push-pull 金字塔从邻近颜色填充。</li>
+        </ol>
+      </div>
+      <figure class="figure" style="margin:0">
+        <img src="assets/img/tex_actor24_skin.jpg" alt="baked skin texture">
+        <figcaption>Actor_24 烘焙得到的皮肤 tile（1001）。约 53% 纹素有真实观测，其余由 push-pull 填充。眼睛、牙齿、舌头 tile 同样从张嘴帧中获得。</figcaption>
+      </figure>
+    </div>
+
+    <div class="sub"><h3>输出格式</h3></div>
+    <div class="cards c3 reveal">
+      <div class="card"><h4>参数</h4><p class="muted"><code>&lt;video&gt;_params.npz</code>：identity (253)、expression (N,383)、rotations (N,4,3)、translation (N,3)、focal、landmarks、逐帧误差；<code>identity.npz</code>、<code>summary.json</code>。</p></div>
+      <div class="card"><h4>网格</h4><p class="muted"><code>&lt;video&gt;_vertices.npz</code>：float16 全帧顶点；每 50 帧一个 OBJ（四边面、平滑顶点法线、UDIM UV、按 tile 分材质的 MTL），Blender / MeshLab 直接打开即带纹理。</p></div>
+      <div class="card"><h4>视频</h4><p class="muted">三联画 [源 + 关键点 | 叠加 | 灰底]，无纹理版和贴图版各一套，H.264 + 原始音轨，可直接在 VSCode / 浏览器预览。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section id="results">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">03 / 结果演示</div>
+      <div>
+        <h2>RAVDESS 与 HDTF 上的重建结果</h2>
+        <p>RAVDESS Actor_24 的 11 段唱歌视频（同一人、强表情）联合拟合一组身份；HDTF 挑选 6 段不同说话人的新闻 / 演讲片段逐段拟合。所有视频 512×512、25 fps。</p>
+      </div>
+    </div>
+
+    <div class="legend reveal">
+      <span><i style="background:#5eead4"></i>左：源视频 + FAN 关键点（绿点）</span>
+      <span><i style="background:#f59e0b"></i>中：贴图头部回贴到源视频（或半透明网格叠加）</span>
+      <span><i style="background:#818cf8"></i>右：贴图头部灰底渲染（或无纹理网格）</span>
+      <span class="muted">视频含原始音轨，点击播放并打开声音</span>
+    </div>
+
+    <div class="tabs reveal" role="tablist">
+      <button class="active" data-tab="ravdess">RAVDESS · Actor_24</button>
+      <button data-tab="hdtf">HDTF · 6 位说话人</button>
+    </div>
+
+    <div class="tabpanel active" id="tab-ravdess">
+      <div class="vgrid">
+        <div class="vcard"><video controls preload="metadata" src="assets/video/actor24_00003_textured.mp4"></video><div class="meta"><b>视频 03 · 贴图</b><span>536 帧 · 5.49 px</span></div></div>
+        <div class="vcard"><video controls preload="metadata" src="assets/video/actor24_00003_mesh.mp4"></video><div class="meta"><b>视频 03 · 无纹理网格</b><span>同一段，几何叠加</span></div></div>
+        <div class="vcard"><video controls preload="metadata" src="assets/video/actor24_00001_textured.mp4"></video><div class="meta"><b>视频 01 · 贴图</b><span>468 帧 · 4.22 px</span></div></div>
+        <div class="vcard"><video controls preload="metadata" src="assets/video/actor24_00005_textured.mp4"></video><div class="meta"><b>视频 05 · 贴图</b><span>484 帧 · 5.37 px</span></div></div>
+        <div class="vcard"><video controls preload="metadata" src="assets/video/actor24_00007_textured.mp4"></video><div class="meta"><b>视频 07 · 贴图</b><span>504 帧 · 5.06 px</span></div></div>
+        <div class="vcard" style="display:flex;flex-direction:column">
+          <video autoplay muted loop playsinline preload="auto" src="assets/video/turntable_actor24.mp4" style="aspect-ratio:1/1;max-height:380px;object-fit:contain;margin:auto"></video>
+          <div class="meta"><b>360° 旋转</b><span>视频 03 第 40 帧</span></div>
+        </div>
+      </div>
+
+      <div class="sub"><h3>定量结果 · Actor_24</h3></div>
+      <div class="cards c2">
+        <div class="table-wrap">
+          <table>
+            <tr><th>视频</th><th class="num">帧数</th><th class="num">有效</th><th class="num">平均误差 (px)</th></tr>
+            <tr><td>00001</td><td class="num">468</td><td class="num">468</td><td class="num">4.22</td></tr>
+            <tr><td>00002</td><td class="num">528</td><td class="num">528</td><td class="num">5.48</td></tr>
+            <tr><td>00003</td><td class="num">536</td><td class="num">536</td><td class="num">5.49</td></tr>
+            <tr><td>00004</td><td class="num">470</td><td class="num">470</td><td class="num">4.92</td></tr>
+            <tr><td>00005</td><td class="num">484</td><td class="num">484</td><td class="num">5.37</td></tr>
+            <tr><td>00006</td><td class="num">500</td><td class="num">500</td><td class="num">4.49</td></tr>
+            <tr><td>00007</td><td class="num">504</td><td class="num">504</td><td class="num">5.06</td></tr>
+            <tr><td>00008</td><td class="num">449</td><td class="num">449</td><td class="num">4.75</td></tr>
+            <tr><td>00009</td><td class="num">440</td><td class="num">440</td><td class="num">4.94</td></tr>
+            <tr><td>00010</td><td class="num">457</td><td class="num">457</td><td class="num">5.16</td></tr>
+            <tr><td>00011</td><td class="num">440</td><td class="num">440</td><td class="num">4.63</td></tr>
+            <tr><td><b>合计</b></td><td class="num"><b>5,276</b></td><td class="num"><b>5,276</b></td><td class="num"><b>4.96</b></td></tr>
+          </table>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:18px">
+            <h4>拟合统计</h4>
+            <dl class="kv">
+              <dt>focal</dt><dd>1,819 px（共享，自动求解）</dd>
+              <dt>identity</dt><dd>|α|<sub>max</sub> = 1.41（在先验范围内）</dd>
+              <dt>expression</dt><dd>|β/σ|<sub>max</sub> = 5.45</dd>
+              <dt>fit time</dt><dd>5,276 帧联合优化 ≈ 40 s（H100）</dd>
+              <dt>texture</dt><dd>1,321 帧参与烘焙，皮肤 tile 观测覆盖 53%</dd>
+            </dl>
+          </div>
+          <figure class="figure" style="margin:0">
+            <img src="assets/img/tex_actor24_tiles.jpg" alt="actor24 tiles">
+            <figcaption>Actor_24 其余 tile：左眼内/外、右眼内/外、牙齿牙龈、舌头。</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="tab-hdtf">
+      <div class="vgrid">
+        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00338_textured.mp4"></video><div class="meta"><b>V4-00338</b><span>725 帧 · 3.86 px</span></div></div>
+        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00282_textured.mp4"></video><div class="meta"><b>V4-00282</b><span>725 帧 · 4.26 px</span></div></div>
+        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00286_textured.mp4"></video><div class="meta"><b>V4-00286 · 戴眼镜</b><span>625 帧 · 3.99 px</span></div></div>
+        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00296_textured.mp4"></video><div class="meta"><b>V4-00296</b><span>950 帧 · 5.00 px</span></div></div>
+        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00349_textured.mp4"></video><div class="meta"><b>V4-00349 · 络腮胡</b><span>750 帧 · 4.12 px</span></div></div>
+        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00025_textured.mp4"></video><div class="meta"><b>V4-00025</b><span>700 帧 · 4.35 px</span></div></div>
+      </div>
+
+      <div class="sub"><h3>定量结果 · HDTF</h3></div>
+      <div class="cards c2">
+        <div class="table-wrap">
+          <table>
+            <tr><th>片段</th><th class="num">帧数</th><th class="num">平均误差 (px)</th><th>备注</th></tr>
+            <tr><td>V4-00338</td><td class="num">725</td><td class="num">3.86</td><td>女性，暗背景</td></tr>
+            <tr><td>V4-00282</td><td class="num">725</td><td class="num">4.26</td><td>男性，侧转头</td></tr>
+            <tr><td>V4-00286</td><td class="num">625</td><td class="num">3.99</td><td>戴眼镜</td></tr>
+            <tr><td>V4-00296</td><td class="num">950</td><td class="num">5.00</td><td>强表情，眉毛动作多</td></tr>
+            <tr><td>V4-00349</td><td class="num">750</td><td class="num">4.12</td><td>络腮胡，大幅转头</td></tr>
+            <tr><td>V4-00025</td><td class="num">700</td><td class="num">4.35</td><td>年长女性</td></tr>
+            <tr><td><b>合计</b></td><td class="num"><b>4,475</b></td><td class="num"><b>4.31</b></td><td>每段单独身份，两路并行约 11 min / 段</td></tr>
+          </table>
+        </div>
+        <div class="turn">
+          <div>
+            <video autoplay muted loop playsinline preload="auto" src="assets/video/turntable_hdtf349.mp4" poster="assets/img/turntable_hdtf349_poster.jpg"></video>
+            <p class="muted" style="font-size:13px;margin-top:8px">V4-00349 第 375 帧 360° 旋转：胡须与发际线被烘进皮肤贴图，后脑为填充色。</p>
+          </div>
+          <figure class="figure" style="margin:0">
+            <img src="assets/img/tex_hdtf349_skin.jpg" alt="hdtf skin texture">
+            <figcaption>V4-00349 皮肤 tile。</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LIMITS ============ -->
+<section id="limits">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="num">04 / 局限与展望</div>
+      <div>
+        <h2>目前的边界，以及下一步</h2>
+      </div>
+    </div>
+    <div class="cards c2 reveal">
+      <div class="card">
+        <h3>局限</h3>
+        <ul class="tight">
+          <li><b>只用了关键点：</b>68 点只约束稀疏位置，脸颊、额头的形状由先验决定，身份偏"平均"；眼睑开合、视线、舌头均不可观测。</li>
+          <li><b>纹理是烘焙而非反照率：</b>拍摄光照、阴影、眼镜、胡须、头发全部烘进贴图；多帧平均 + 约 5 px 拟合误差带来轻微模糊。</li>
+          <li><b>无头发几何：</b>头发只是贴在头皮形状上，大幅转头时边缘会拉伸。</li>
+          <li><b>单视角覆盖：</b>皮肤 tile 仅约一半纹素有真实观测，后脑、颈下为填充色。</li>
+          <li><b>颈部以下：</b>GNM 带肩颈，但视频下边缘截断，这部分几何与纹理不可靠。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>下一步</h3>
+        <ul class="tight">
+          <li><b>光度项：</b>加入可微渲染（nvdiffrast / pytorch3d）的像素级损失，同时求解反照率与球谐光照，提升身份细节和纹理清晰度。</li>
+          <li><b>稠密对应：</b>用 MediaPipe 478 点或 DECA/EMOCA 风格的稠密监督替代 68 点，约束脸颊与眼睑。</li>
+          <li><b>眼球与视线：</b>利用 GNM 的眼球关节与瞳孔分量，加上虹膜检测做视线估计。</li>
+          <li><b>语音驱动：</b>以本流程得到的 (β, θ) 序列作为训练目标，训练 audio → GNM 表情系数的驱动模型，实现 3D talking head 生成。</li>
+          <li><b>规模化：</b>脚本已支持批量；HDTF 400 段全量约 70 GPU·h，可直接扩展成训练数据集。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <b style="color:var(--text)">代码与数据</b>
+      <p>工程目录 <code>/scratch3/wan451/3DTalk/test_gnm_recons</code>：<code>scripts/detect_landmarks.py</code>、<code>scripts/fit_gnm.py</code>、<code>scripts/render_results.py</code>、<code>scripts/bake_texture.py</code>；一键脚本 <code>run_actor24.sh</code>（RAVDESS）与 <code>run_hdtf.sh &lt;clip&gt;…</code>（HDTF）。环境：Python 3.12 / PyTorch 2.11 cu128 / GNM commit abbad03 / face-alignment / pyrender 0.1.45 + EGL。</p>
+    </div>
+    <div>
+      <b style="color:var(--text)">引用</b>
+      <p>Ploumpis et al., <em>GNM Head: A Generative aNthropometric Model of the human head</em>, 2026. arXiv:2607.23687.<br>Bulat &amp; Tzimiropoulos, <em>How far are we from solving the 2D &amp; 3D Face Alignment problem?</em>, ICCV 2017 (FAN).<br>RAVDESS (Livingstone &amp; Russo, 2018)；HDTF (Zhang et al., CVPR 2021)。</p>
+    </div>
+  </div>
+</footer>
+
+<div id="lb"><img alt=""></div>
+
+<script>
+// scroll reveal
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .08 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+// tabs
+document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('active', x === b));
+  document.querySelectorAll('.tabpanel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + b.dataset.tab));
+  document.querySelectorAll('.tabpanel:not(.active) video').forEach(v => v.pause());
+}));
+// lightbox
+const lb = document.getElementById('lb'), lbi = lb.querySelector('img');
+document.querySelectorAll('.figure img').forEach(im => im.addEventListener('click', () => { lbi.src = im.src; lb.classList.add('open'); }));
+lb.addEventListener('click', () => lb.classList.remove('open'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+// active nav
+const secs = [...document.querySelectorAll('section[id]')], links = [...document.querySelectorAll('nav li a')];
+const nio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id)); }), { rootMargin: '-40% 0px -55% 0px' });
+secs.forEach(s => nio.observe(s));
+// only one demo video plays at a time
+document.querySelectorAll('.vcard video[controls]').forEach(v => v.addEventListener('play', () => document.querySelectorAll('.vcard video[controls]').forEach(o => { if (o !== v) o.pause(); })));
+</script>
+</body>
+</html>
