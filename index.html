@@ -114,11 +114,23 @@ ul.tight li{margin:.25em 0}
 .step::after{content:"→";position:absolute;right:-13px;top:46%;color:var(--line);font-size:18px;z-index:1}
 .step:last-child::after{content:""}
 
-/* video grid */
+/* case rows: 6-column video + aligned label strip */
+.cases{display:grid;gap:22px}
+.case{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.case video{width:100%;aspect-ratio:6/1;background:#000;display:block}
+.case .labels{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid var(--line);background:var(--bg2)}
+.case .labels div{padding:8px 6px 9px;text-align:center;font-size:12.5px;line-height:1.3;border-left:1px solid var(--line)}
+.case .labels div:first-child{border-left:none}
+.case .labels b{display:block;font-weight:600;color:var(--text)}
+.case .labels span{display:block;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.02em}
+.case .meta{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 14px;font-size:13.5px;border-top:1px solid var(--line)}
+.case .meta b{font-weight:600}
+.case .meta span{color:var(--muted);font-family:var(--mono);font-size:12.5px}
+@media(max-width:700px){.case .labels div{font-size:10.5px;padding:6px 3px}.case .labels span{display:none}}
 .vgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
 @media(max-width:760px){.vgrid{grid-template-columns:1fr}}
 .vcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-.vcard video{width:100%;aspect-ratio:3/1;background:#000}
+.vcard video{width:100%;aspect-ratio:1/1;background:#000}
 .vcard .meta{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;font-size:13.5px}
 .vcard .meta b{font-weight:600}
 .vcard .meta span{color:var(--muted);font-family:var(--mono);font-size:12.5px}
@@ -382,7 +394,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
     <div class="cards c3 reveal">
       <div class="card"><h4>参数</h4><p class="muted"><code>&lt;video&gt;_params.npz</code>：identity (253)、expression (N,383)、rotations (N,4,3)、translation (N,3)、focal、landmarks、逐帧误差；<code>identity.npz</code>、<code>summary.json</code>。</p></div>
       <div class="card"><h4>网格</h4><p class="muted"><code>&lt;video&gt;_vertices.npz</code>：float16 全帧顶点；每 50 帧一个 OBJ（四边面、平滑顶点法线、UDIM UV、按 tile 分材质的 MTL），Blender / MeshLab 直接打开即带纹理。</p></div>
-      <div class="card"><h4>视频</h4><p class="muted">三联画 [源 + 关键点 | 叠加 | 灰底]，无纹理版和贴图版各一套，H.264 + 原始音轨，可直接在 VSCode / 浏览器预览。</p></div>
+      <div class="card"><h4>视频</h4><p class="muted">三联画 [源 + 关键点 | 叠加 | 灰底]，无纹理版和贴图版各一套（演示页合成为六列），H.264 + 原始音轨，可直接在 VSCode / 浏览器预览。</p></div>
     </div>
   </div>
 </section>
@@ -399,10 +411,8 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
     </div>
 
     <div class="legend reveal">
-      <span><i style="background:#5eead4"></i>左：源视频 + FAN 关键点（绿点）</span>
-      <span><i style="background:#f59e0b"></i>中：贴图头部回贴到源视频（或半透明网格叠加）</span>
-      <span><i style="background:#818cf8"></i>右：贴图头部灰底渲染（或无纹理网格）</span>
-      <span class="muted">视频含原始音轨，点击播放并打开声音</span>
+      <span>每个 case 为六列同步视频：<b>源视频 → 关键点 → 网格叠加 → 无纹理网格 → 贴图叠加 → 贴图渲染</b>，列标签在视频下方对齐显示</span>
+      <span class="muted">视频含原始音轨，点击播放并打开声音；同一时间只播放一个</span>
     </div>
 
     <div class="tabs reveal" role="tablist">
@@ -411,16 +421,62 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
     </div>
 
     <div class="tabpanel active" id="tab-ravdess">
-      <div class="vgrid">
-        <div class="vcard"><video controls preload="metadata" src="assets/video/actor24_00003_textured.mp4"></video><div class="meta"><b>视频 03 · 贴图</b><span>536 帧 · 5.49 px</span></div></div>
-        <div class="vcard"><video controls preload="metadata" src="assets/video/actor24_00003_mesh.mp4"></video><div class="meta"><b>视频 03 · 无纹理网格</b><span>同一段，几何叠加</span></div></div>
-        <div class="vcard"><video controls preload="metadata" src="assets/video/actor24_00001_textured.mp4"></video><div class="meta"><b>视频 01 · 贴图</b><span>468 帧 · 4.22 px</span></div></div>
-        <div class="vcard"><video controls preload="metadata" src="assets/video/actor24_00005_textured.mp4"></video><div class="meta"><b>视频 05 · 贴图</b><span>484 帧 · 5.37 px</span></div></div>
-        <div class="vcard"><video controls preload="metadata" src="assets/video/actor24_00007_textured.mp4"></video><div class="meta"><b>视频 07 · 贴图</b><span>504 帧 · 5.06 px</span></div></div>
-        <div class="vcard" style="display:flex;flex-direction:column">
-          <video autoplay muted loop playsinline preload="auto" src="assets/video/turntable_actor24.mp4" style="aspect-ratio:1/1;max-height:380px;object-fit:contain;margin:auto"></video>
-          <div class="meta"><b>360° 旋转</b><span>视频 03 第 40 帧</span></div>
+      <div class="cases">
+      <div class="case">
+        <video controls preload="metadata" src="assets/video/actor24_00003_6col.mp4"></video>
+        <div class="labels">
+          <div><b>源视频</b><span>source</span></div>
+          <div><b>FAN 68 关键点</b><span>landmarks</span></div>
+          <div><b>网格叠加</b><span>mesh overlay</span></div>
+          <div><b>无纹理网格</b><span>mesh, grey</span></div>
+          <div><b>贴图叠加</b><span>textured overlay</span></div>
+          <div><b>贴图渲染</b><span>textured, grey</span></div>
         </div>
+        <div class="meta"><b>视频 03</b><span>536 帧 · 5.49 px</span></div>
+      </div>
+      <div class="case">
+        <video controls preload="metadata" src="assets/video/actor24_00001_6col.mp4"></video>
+        <div class="labels">
+          <div><b>源视频</b><span>source</span></div>
+          <div><b>FAN 68 关键点</b><span>landmarks</span></div>
+          <div><b>网格叠加</b><span>mesh overlay</span></div>
+          <div><b>无纹理网格</b><span>mesh, grey</span></div>
+          <div><b>贴图叠加</b><span>textured overlay</span></div>
+          <div><b>贴图渲染</b><span>textured, grey</span></div>
+        </div>
+        <div class="meta"><b>视频 01</b><span>468 帧 · 4.22 px</span></div>
+      </div>
+      <div class="case">
+        <video controls preload="metadata" src="assets/video/actor24_00005_6col.mp4"></video>
+        <div class="labels">
+          <div><b>源视频</b><span>source</span></div>
+          <div><b>FAN 68 关键点</b><span>landmarks</span></div>
+          <div><b>网格叠加</b><span>mesh overlay</span></div>
+          <div><b>无纹理网格</b><span>mesh, grey</span></div>
+          <div><b>贴图叠加</b><span>textured overlay</span></div>
+          <div><b>贴图渲染</b><span>textured, grey</span></div>
+        </div>
+        <div class="meta"><b>视频 05</b><span>484 帧 · 5.37 px</span></div>
+      </div>
+      <div class="case">
+        <video controls preload="metadata" src="assets/video/actor24_00007_6col.mp4"></video>
+        <div class="labels">
+          <div><b>源视频</b><span>source</span></div>
+          <div><b>FAN 68 关键点</b><span>landmarks</span></div>
+          <div><b>网格叠加</b><span>mesh overlay</span></div>
+          <div><b>无纹理网格</b><span>mesh, grey</span></div>
+          <div><b>贴图叠加</b><span>textured overlay</span></div>
+          <div><b>贴图渲染</b><span>textured, grey</span></div>
+        </div>
+        <div class="meta"><b>视频 07</b><span>504 帧 · 5.06 px</span></div>
+      </div>
+      </div>
+      <div class="vgrid" style="margin-top:22px">
+        <div class="vcard"><video autoplay muted loop playsinline preload="auto" src="assets/video/turntable_actor24.mp4" poster="assets/img/turntable_actor24_poster.jpg"></video><div class="meta"><b>360° 旋转 · 贴图头部</b><span>视频 03 第 40 帧</span></div></div>
+        <figure class="figure" style="margin:0">
+          <img src="assets/img/tex_actor24_skin.jpg" alt="actor24 skin texture">
+          <figcaption>Actor_24 烘焙皮肤 tile（1001），2048²。</figcaption>
+        </figure>
       </div>
 
       <div class="sub"><h3>定量结果 · Actor_24</h3></div>
@@ -462,13 +518,79 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
     </div>
 
     <div class="tabpanel" id="tab-hdtf">
-      <div class="vgrid">
-        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00338_textured.mp4"></video><div class="meta"><b>V4-00338</b><span>725 帧 · 3.86 px</span></div></div>
-        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00282_textured.mp4"></video><div class="meta"><b>V4-00282</b><span>725 帧 · 4.26 px</span></div></div>
-        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00286_textured.mp4"></video><div class="meta"><b>V4-00286 · 戴眼镜</b><span>625 帧 · 3.99 px</span></div></div>
-        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00296_textured.mp4"></video><div class="meta"><b>V4-00296</b><span>950 帧 · 5.00 px</span></div></div>
-        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00349_textured.mp4"></video><div class="meta"><b>V4-00349 · 络腮胡</b><span>750 帧 · 4.12 px</span></div></div>
-        <div class="vcard"><video controls preload="metadata" src="assets/video/hdtf_00025_textured.mp4"></video><div class="meta"><b>V4-00025</b><span>700 帧 · 4.35 px</span></div></div>
+      <div class="cases">
+      <div class="case">
+        <video controls preload="metadata" src="assets/video/hdtf_00338_6col.mp4"></video>
+        <div class="labels">
+          <div><b>源视频</b><span>source</span></div>
+          <div><b>FAN 68 关键点</b><span>landmarks</span></div>
+          <div><b>网格叠加</b><span>mesh overlay</span></div>
+          <div><b>无纹理网格</b><span>mesh, grey</span></div>
+          <div><b>贴图叠加</b><span>textured overlay</span></div>
+          <div><b>贴图渲染</b><span>textured, grey</span></div>
+        </div>
+        <div class="meta"><b>V4-00338</b><span>725 帧 · 3.86 px</span></div>
+      </div>
+      <div class="case">
+        <video controls preload="metadata" src="assets/video/hdtf_00282_6col.mp4"></video>
+        <div class="labels">
+          <div><b>源视频</b><span>source</span></div>
+          <div><b>FAN 68 关键点</b><span>landmarks</span></div>
+          <div><b>网格叠加</b><span>mesh overlay</span></div>
+          <div><b>无纹理网格</b><span>mesh, grey</span></div>
+          <div><b>贴图叠加</b><span>textured overlay</span></div>
+          <div><b>贴图渲染</b><span>textured, grey</span></div>
+        </div>
+        <div class="meta"><b>V4-00282</b><span>725 帧 · 4.26 px</span></div>
+      </div>
+      <div class="case">
+        <video controls preload="metadata" src="assets/video/hdtf_00286_6col.mp4"></video>
+        <div class="labels">
+          <div><b>源视频</b><span>source</span></div>
+          <div><b>FAN 68 关键点</b><span>landmarks</span></div>
+          <div><b>网格叠加</b><span>mesh overlay</span></div>
+          <div><b>无纹理网格</b><span>mesh, grey</span></div>
+          <div><b>贴图叠加</b><span>textured overlay</span></div>
+          <div><b>贴图渲染</b><span>textured, grey</span></div>
+        </div>
+        <div class="meta"><b>V4-00286 · 戴眼镜</b><span>625 帧 · 3.99 px</span></div>
+      </div>
+      <div class="case">
+        <video controls preload="metadata" src="assets/video/hdtf_00296_6col.mp4"></video>
+        <div class="labels">
+          <div><b>源视频</b><span>source</span></div>
+          <div><b>FAN 68 关键点</b><span>landmarks</span></div>
+          <div><b>网格叠加</b><span>mesh overlay</span></div>
+          <div><b>无纹理网格</b><span>mesh, grey</span></div>
+          <div><b>贴图叠加</b><span>textured overlay</span></div>
+          <div><b>贴图渲染</b><span>textured, grey</span></div>
+        </div>
+        <div class="meta"><b>V4-00296</b><span>950 帧 · 5.00 px</span></div>
+      </div>
+      <div class="case">
+        <video controls preload="metadata" src="assets/video/hdtf_00349_6col.mp4"></video>
+        <div class="labels">
+          <div><b>源视频</b><span>source</span></div>
+          <div><b>FAN 68 关键点</b><span>landmarks</span></div>
+          <div><b>网格叠加</b><span>mesh overlay</span></div>
+          <div><b>无纹理网格</b><span>mesh, grey</span></div>
+          <div><b>贴图叠加</b><span>textured overlay</span></div>
+          <div><b>贴图渲染</b><span>textured, grey</span></div>
+        </div>
+        <div class="meta"><b>V4-00349 · 络腮胡</b><span>750 帧 · 4.12 px</span></div>
+      </div>
+      <div class="case">
+        <video controls preload="metadata" src="assets/video/hdtf_00025_6col.mp4"></video>
+        <div class="labels">
+          <div><b>源视频</b><span>source</span></div>
+          <div><b>FAN 68 关键点</b><span>landmarks</span></div>
+          <div><b>网格叠加</b><span>mesh overlay</span></div>
+          <div><b>无纹理网格</b><span>mesh, grey</span></div>
+          <div><b>贴图叠加</b><span>textured overlay</span></div>
+          <div><b>贴图渲染</b><span>textured, grey</span></div>
+        </div>
+        <div class="meta"><b>V4-00025</b><span>700 帧 · 4.35 px</span></div>
+      </div>
       </div>
 
       <div class="sub"><h3>定量结果 · HDTF</h3></div>
@@ -569,7 +691,7 @@ const secs = [...document.querySelectorAll('section[id]')], links = [...document
 const nio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id)); }), { rootMargin: '-40% 0px -55% 0px' });
 secs.forEach(s => nio.observe(s));
 // only one demo video plays at a time
-document.querySelectorAll('.vcard video[controls]').forEach(v => v.addEventListener('play', () => document.querySelectorAll('.vcard video[controls]').forEach(o => { if (o !== v) o.pause(); })));
+document.querySelectorAll('.case video').forEach(v => v.addEventListener('play', () => document.querySelectorAll('.case video').forEach(o => { if (o !== v) o.pause(); })));
 </script>
 </body>
 </html>
