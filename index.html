@@ -293,6 +293,19 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
       <figcaption><b>表情采样：</b>ExpressionSampler 的 20 个语义类中的 6 类。表情基按区域分块（左眼 / 右眼 / 下半脸 / 舌头 / 瞳孔），牙齿和舌头随之运动。注意系数是<b>原始 PCA 系数</b>，各分量尺度差异很大（首分量 1.0 ≈ 8 mm 位移），这对拟合时的正则化很关键。</figcaption>
     </figure>
 
+    <div class="sub"><h3>为什么还需要条件 VAE：PCA 子空间里的"非人"样本</h3><span class="pill amber">prior</span></div>
+    <div class="card reveal" style="margin-bottom:18px">
+      <p style="margin:0">PCA 基只回答"头能往哪些方向变"，对系数的取值没有约束：子空间里既有真人，也有大量不是人的线性组合。下面两组实验都只改系数、不改基，每列用同一种构造方式（σ 为各分量在采样器样本上的标准差，身份用 1,200 个样本、表情用 2,000 个样本估计）：<b>VAE 采样</b> → <b>各维独立高斯 1σ</b> → <b>各维独立高斯 3σ</b> → <b>两个合法样本外推 a + 4(a − b)</b> → <b>把合法样本的分量随机打乱</b> → <b>所有分量同时 +2σ</b>。上排正面，下排侧面。</p>
+    </div>
+    <figure class="figure reveal">
+      <img src="assets/img/prior_identity_nonhuman.jpg" alt="non-human identity coefficients">
+      <figcaption><b>身份（253 维）：</b>身份空间在 1–2σ 内相当宽容，独立高斯采样、分量打乱甚至全部 +2σ 都仍像人，说明头部形状的分布接近高斯；真正出问题的是<b>尺度</b>：3σ 已经失调，外推 a + 4(a − b) 得到塌陷的脸、移位的眼睛和巨大的耳朵。对身份而言，VAE 的价值主要在语义控制（指定人群 / 性别）和把样本限制在数据簇内。</figcaption>
+    </figure>
+    <figure class="figure reveal">
+      <img src="assets/img/prior_expression_nonhuman.jpg" alt="non-human expression coefficients">
+      <figcaption><b>表情（383 维）：</b>差别大得多。独立高斯 1σ 已经出现不对称的撅嘴，3σ 时整张脸扭曲，外推得到肌肉上不可能同时出现的咧嘴 + 挤眼，全部 +2σ 则是鼓腮瞪眼。真实表情只占这个子空间里一条很薄的流形，且各分量尺度相差两个数量级（σ 从 0.015 到 1.16）。这正是重建时表情正则必须用采样器估计的逐分量 σ、而不能用统一尺度的原因。</figcaption>
+    </figure>
+
     <div class="sub"><h3>骨骼、蒙皮与网格组件</h3><span class="pill amber">LBS</span></div>
     <div class="cards c2 reveal">
       <figure class="figure" style="margin:0">
