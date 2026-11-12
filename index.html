@@ -60,7 +60,7 @@ nav li a:hover,nav li a.active{color:var(--text);background:var(--panel2);text-d
 .stat b{display:block;font-size:26px;font-weight:800;letter-spacing:-.02em}
 .stat span{font-size:13px;color:var(--muted)}
 .hero-media{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);background:#000}
-.hero-media video{width:100%;aspect-ratio:1/1;object-fit:cover}
+.hero-media .viewer{border:none;border-radius:0}
 .hero-media figcaption{padding:10px 14px;font-size:13px;color:var(--muted);background:var(--panel)}
 
 /* sections */
@@ -126,7 +126,7 @@ ul.tight li{margin:.25em 0}
 .case .meta{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 14px;font-size:13.5px;border-top:1px solid var(--line)}
 .case .meta b{font-weight:600}
 .case .meta span{color:var(--muted);font-family:var(--mono);font-size:12.5px}
-.case .meta .emo{margin-left:auto;margin-right:14px;font-family:var(--sans);font-weight:600;color:var(--accent2);background:#2b2416;border:1px solid #4a3a17;border-radius:999px;padding:2px 10px;font-size:12.5px}
+.case .meta .emo{margin:0 auto 0 12px;font-family:var(--sans);font-weight:600;color:var(--accent2);background:#2b2416;border:1px solid #4a3a17;border-radius:999px;padding:2px 10px;font-size:12.5px}
 @media(max-width:700px){.case .labels div{font-size:10.5px;padding:6px 3px}.case .labels span{display:none}}
 /* 3D viewer */
 .viewer{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
@@ -206,8 +206,13 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
       </div>
     </div>
     <figure class="hero-media">
-      <video src="assets/video/turntable_actor24.mp4" autoplay muted loop playsinline poster="assets/img/turntable_actor24_poster.jpg"></video>
-      <figcaption>RAVDESS Actor_24：拟合几何 + 从视频烘焙的 UDIM 纹理（结果演示部分有可交互 3D 模型）</figcaption>
+      <div class="viewer hero-viewer" data-src="assets/models/actor24_v03_f40.glb">
+        <canvas></canvas>
+        <div class="loading">加载 3D 模型 …</div>
+        <div class="hint">拖动旋转 · 滚轮缩放</div>
+        <div class="vbar"><b>RAVDESS Actor_24</b><button data-act="rotate" class="on">自动旋转</button><button data-act="tex" class="on">贴图</button><button data-act="wire">线框</button></div>
+      </div>
+      <figcaption>拟合几何 + 从视频烘焙的 UDIM 纹理，可交互 3D 模型（V1-Song-Actor_24-00003 平静·强，第 40 帧）</figcaption>
     </figure>
   </div>
 </header>
