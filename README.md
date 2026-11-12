@@ -22,6 +22,10 @@ assets/js/            自托管 three.js r160 打包（three-bundle.js）
 assets/video/         演示视频（H.264 + AAC，六列：源 | 关键点 | 网格叠加 | 网格灰底 | 贴图叠加 | 贴图灰底）
 ```
 
+## 更新页面
+
+修改后先运行 `python tools/stamp_version.py`（给所有资源链接加版本号并写入页脚 build 标记，避免浏览器 / GitHub Pages 缓存旧资源），再提交推送。
+
 ## 复现
 
 代码位于工作目录 `test_gnm_recons/scripts/`（`detect_landmarks.py`、`fit_gnm.py`、`bake_texture.py`、`render_results.py`、`make_report_assets.py`），
