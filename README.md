@@ -4,8 +4,7 @@
 身份 / 逐帧表情 / 头部姿态联合优化 + 从视频烘焙 UDIM 纹理，在 RAVDESS 与 HDTF 上的演示。
 
 **在线页面（GitHub Pages）：** https://caesarrwang.github.io/avatar_gnome/
-本地查看：在仓库目录起一个静态服务再打开，例如 `python -m http.server 8000` → http://localhost:8000/ 
-（直接双击 `index.html` 也能看图片和视频，但浏览器会拦截 `file://` 下的 GLB 加载，3D 模型不显示）。
+本地查看：`git clone` 后直接双击 `index.html` 即可（图片、视频和 3D 模型都通过普通 `<script>`/相对路径加载，不需要起静态服务）。
 
 ## 内容
 
@@ -18,7 +17,8 @@
 ```
 index.html            报告页面
 assets/img/           图表（GNM 可视化、流程分解、纹理）
-assets/models/        可交互 3D 模型（GLB，带 UDIM 纹理，three.js 加载）
+assets/models/        可交互 3D 模型（GLB + 同名 .glb.js base64 数据脚本，three.js 加载）
+assets/js/            自托管 three.js r160 打包（three-bundle.js）
 assets/video/         演示视频（H.264 + AAC，六列：源 | 关键点 | 网格叠加 | 网格灰底 | 贴图叠加 | 贴图灰底）
 ```
 
