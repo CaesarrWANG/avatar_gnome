@@ -4,19 +4,21 @@
 身份 / 逐帧表情 / 头部姿态联合优化 + 从视频烘焙 UDIM 纹理，在 RAVDESS 与 HDTF 上的演示。
 
 **在线页面（GitHub Pages）：** https://caesarrwang.github.io/avatar_gnome/
-本地查看：直接用浏览器打开 `index.html`（视频与图片均为相对路径）。
+本地查看：在仓库目录起一个静态服务再打开，例如 `python -m http.server 8000` → http://localhost:8000/ 
+（直接双击 `index.html` 也能看图片和视频，但浏览器会拦截 `file://` 下的 GLB 加载，3D 模型不显示）。
 
 ## 内容
 
 - **GNM 模型内部细节** — 前向模型公式、253 维身份 / 383 维表情基、4 关节 LBS 与姿态修正、46 个顶点组、UDIM UV、68 关键点定义、语义采样器。
 - **重建方法** — FAN 68 点关键点 → 两阶段 Adam 联合优化（共享身份与焦距，逐帧表情/姿态，采样器先验 + 时域平滑）→ 全网格导出 → 纹理烘焙（深度可见性 + cos⁴ 加权 + push-pull 补洞）。
-- **结果演示** — RAVDESS Actor_24 11 段（5,276 帧，4.96 px）与 HDTF 6 段（4,475 帧，4.31 px）的贴图渲染视频（含音轨）、360° 旋转、纹理 tile 与定量表格。
+- **结果演示** — RAVDESS Actor_24 11 段（5,276 帧，4.96 px）与 HDTF 6 段（4,475 帧，4.31 px）的六列对比视频（含音轨）、可交互的贴图 3D 模型、纹理 tile 与定量表格。
 
 ## 目录
 
 ```
 index.html            报告页面
 assets/img/           图表（GNM 可视化、流程分解、纹理）
+assets/models/        可交互 3D 模型（GLB，带 UDIM 纹理，three.js 加载）
 assets/video/         演示视频（H.264 + AAC，六列：源 | 关键点 | 网格叠加 | 网格灰底 | 贴图叠加 | 贴图灰底）
 ```
 

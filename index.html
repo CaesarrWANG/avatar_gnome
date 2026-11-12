@@ -127,6 +127,17 @@ ul.tight li{margin:.25em 0}
 .case .meta b{font-weight:600}
 .case .meta span{color:var(--muted);font-family:var(--mono);font-size:12.5px}
 @media(max-width:700px){.case .labels div{font-size:10.5px;padding:6px 3px}.case .labels span{display:none}}
+/* 3D viewer */
+.viewer{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.viewer canvas{display:block;width:100%;aspect-ratio:1/1;cursor:grab;touch-action:none}
+.viewer canvas:active{cursor:grabbing}
+.viewer .hint{position:absolute;top:12px;left:14px;font-size:12px;color:var(--muted);background:rgba(11,13,18,.6);padding:4px 10px;border-radius:999px;pointer-events:none}
+.viewer .vbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 12px;border-top:1px solid var(--line);font-size:13px}
+.viewer .vbar b{margin-right:auto;font-weight:600}
+.viewer .vbar button,.viewer .vbar a.btn{font:inherit;font-size:12.5px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer}
+.viewer .vbar button.on{color:var(--text);border-color:#2f6f66;background:#15302d}
+.viewer .vbar a.btn:hover{text-decoration:none;color:var(--text)}
+.viewer .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;pointer-events:none}
 .vgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
 @media(max-width:760px){.vgrid{grid-template-columns:1fr}}
 .vcard{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
@@ -195,7 +206,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
     </div>
     <figure class="hero-media">
       <video src="assets/video/turntable_actor24.mp4" autoplay muted loop playsinline poster="assets/img/turntable_actor24_poster.jpg"></video>
-      <figcaption>RAVDESS Actor_24：拟合几何 + 从视频烘焙的 UDIM 纹理，360° 旋转展示</figcaption>
+      <figcaption>RAVDESS Actor_24：拟合几何 + 从视频烘焙的 UDIM 纹理（结果演示部分有可交互 3D 模型）</figcaption>
     </figure>
   </div>
 </header>
@@ -472,7 +483,12 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
       </div>
       </div>
       <div class="vgrid" style="margin-top:22px">
-        <div class="vcard"><video autoplay muted loop playsinline preload="auto" src="assets/video/turntable_actor24.mp4" poster="assets/img/turntable_actor24_poster.jpg"></video><div class="meta"><b>360° 旋转 · 贴图头部</b><span>视频 03 第 40 帧</span></div></div>
+        <div class="viewer" data-src="assets/models/actor24_v03_f40.glb">
+          <canvas></canvas>
+          <div class="loading">加载 3D 模型 …</div>
+          <div class="hint">拖动旋转 · 滚轮缩放 · 右键平移</div>
+          <div class="vbar"><b>3D 模型 · 视频 03 第 40 帧</b><button data-act="rotate" class="on">自动旋转</button><button data-act="tex" class="on">贴图</button><button data-act="wire">线框</button><a class="btn" href="assets/models/actor24_v03_f40.glb" download>下载 GLB</a></div>
+        </div>
         <figure class="figure" style="margin:0">
           <img src="assets/img/tex_actor24_skin.jpg" alt="actor24 skin texture">
           <figcaption>Actor_24 烘焙皮肤 tile（1001），2048²。</figcaption>
@@ -608,13 +624,15 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
           </table>
         </div>
         <div class="turn">
-          <div>
-            <video autoplay muted loop playsinline preload="auto" src="assets/video/turntable_hdtf349.mp4" poster="assets/img/turntable_hdtf349_poster.jpg"></video>
-            <p class="muted" style="font-size:13px;margin-top:8px">V4-00349 第 375 帧 360° 旋转：胡须与发际线被烘进皮肤贴图，后脑为填充色。</p>
-          </div>
+          <div class="viewer" data-src="assets/models/hdtf_00349_f375.glb">
+          <canvas></canvas>
+          <div class="loading">加载 3D 模型 …</div>
+          <div class="hint">拖动旋转 · 滚轮缩放 · 右键平移</div>
+          <div class="vbar"><b>3D 模型 · V4-00349 第 375 帧</b><button data-act="rotate" class="on">自动旋转</button><button data-act="tex" class="on">贴图</button><button data-act="wire">线框</button><a class="btn" href="assets/models/hdtf_00349_f375.glb" download>下载 GLB</a></div>
+        </div>
           <figure class="figure" style="margin:0">
             <img src="assets/img/tex_hdtf349_skin.jpg" alt="hdtf skin texture">
-            <figcaption>V4-00349 皮肤 tile。</figcaption>
+            <figcaption>V4-00349 皮肤 tile。胡须与发际线被烘进皮肤贴图，后脑为填充色。</figcaption>
           </figure>
         </div>
       </div>
@@ -692,6 +710,58 @@ const nio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersectin
 secs.forEach(s => nio.observe(s));
 // only one demo video plays at a time
 document.querySelectorAll('.case video').forEach(v => v.addEventListener('play', () => document.querySelectorAll('.case video').forEach(o => { if (o !== v) o.pause(); })));
+</script>
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+function initViewer(el) {
+  const canvas = el.querySelector('canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 50);
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.autoRotate = true; controls.autoRotateSpeed = 1.6;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x334455, 1.2));
+  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(1, 1.5, 2); scene.add(key);
+  const texMats = [], greyMats = [], meshes = [];
+  let state = { tex: true, wire: false };
+  const apply = () => meshes.forEach((m, i) => { m.material = state.tex ? texMats[i] : greyMats[i]; m.material.wireframe = state.wire; });
+  const resize = () => { const w = canvas.clientWidth, h = canvas.clientHeight; if (canvas.width !== w * renderer.getPixelRatio()) { renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); } };
+  new GLTFLoader().load(el.dataset.src, g => {
+    g.scene.traverse(o => {
+      if (!o.isMesh) return;
+      const map = o.material.map; if (map) map.colorSpace = THREE.SRGBColorSpace;
+      texMats.push(new THREE.MeshBasicMaterial({ map }));           // baked lighting -> unlit
+      greyMats.push(new THREE.MeshStandardMaterial({ color: 0xc9b8a8, roughness: .85, metalness: 0 }));
+      meshes.push(o);
+    });
+    apply();
+    const box = new THREE.Box3().setFromObject(g.scene), c = box.getCenter(new THREE.Vector3()), r = box.getSize(new THREE.Vector3()).length() / 2;
+    g.scene.position.sub(c); scene.add(g.scene);
+    camera.position.set(0, r * 0.15, r * 2.9); controls.target.set(0, 0, 0); controls.update();
+    el.querySelector('.loading').remove();
+    resize(); renderer.render(scene, camera);   // first frame even if rAF is throttled
+  }, undefined, e => { el.querySelector('.loading').textContent = '模型加载失败（本地 file:// 打开时请改用 http 服务或 GitHub Pages）'; });
+  let visible = false;
+  new IntersectionObserver(es => es.forEach(e => visible = e.isIntersecting)).observe(el);
+  (function loop() { requestAnimationFrame(loop); if (!visible) return; resize(); controls.update(); renderer.render(scene, camera); })();
+  el.querySelectorAll('.vbar button').forEach(b => b.addEventListener('click', () => {
+    const act = b.dataset.act;
+    if (act === 'rotate') { controls.autoRotate = !controls.autoRotate; b.classList.toggle('on', controls.autoRotate); }
+    if (act === 'tex') { state.tex = !state.tex; b.classList.toggle('on', state.tex); apply(); }
+    if (act === 'wire') { state.wire = !state.wire; b.classList.toggle('on', state.wire); apply(); }
+  }));
+}
+const vio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { vio.unobserve(e.target); initViewer(e.target); } }), { rootMargin: '400px' });
+document.querySelectorAll('.viewer').forEach(v => vio.observe(v));
 </script>
 </body>
 </html>
