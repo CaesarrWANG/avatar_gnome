@@ -236,7 +236,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
       <div class="step"><div class="n">06</div><b>渲染演示</b><span>pyrender/EGL 叠加、灰底、贴图渲染，H.264 + 原音轨</span></div>
     </div>
     <figure class="figure reveal">
-      <img src="assets/img/pipeline_stages.jpg?v=683cd86-20261112-1252" alt="pipeline stages">
+      <img src="assets/img/pipeline_stages.jpg?v=1180723-20261112-1300" alt="pipeline stages">
       <figcaption>从左到右：<b>源帧</b> → <b>FAN 68 关键点</b> → <b>GNM 拟合叠加</b> → <b>拟合网格</b> → <b>烘焙纹理渲染</b> → <b>贴图头部回贴到视频</b>（RAVDESS Actor_24，V1-Song-Actor_24-00003 平静·强，第 40 帧）。</figcaption>
     </figure>
   </div>
@@ -279,17 +279,17 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
 
     <div class="sub"><h3>模板与拓扑</h3><span class="pill">edge flow</span></div>
     <figure class="figure reveal">
-      <img src="assets/img/gnm_template_views.jpg?v=683cd86-20261112-1252" alt="GNM template">
+      <img src="assets/img/gnm_template_views.jpg?v=1180723-20261112-1300" alt="GNM template">
       <figcaption>GNM 模板（α=β=θ=0），贴 GNM 自带的 edge-flow 纹理显示四边面布线：面部为环绕眼口的同心布线，适合表情形变；包含完整后脑、颈部和耳廓。</figcaption>
     </figure>
 
     <div class="sub"><h3>身份空间与表情空间</h3><span class="pill violet">semantic sampler</span></div>
     <figure class="figure reveal">
-      <img src="assets/img/gnm_identity_samples.jpg?v=683cd86-20261112-1252" alt="identity samples">
+      <img src="assets/img/gnm_identity_samples.jpg?v=1180723-20261112-1300" alt="identity samples">
       <figcaption><b>身份采样：</b>由 IdentitySampler（条件 VAE 解码器）按性别 × 人群采样的 253 维身份系数，作用于模板。关节位置随身份一起变化（<code>joint_identity_basis</code>）。</figcaption>
     </figure>
     <figure class="figure reveal">
-      <img src="assets/img/gnm_expression_samples.jpg?v=683cd86-20261112-1252" alt="expression samples">
+      <img src="assets/img/gnm_expression_samples.jpg?v=1180723-20261112-1300" alt="expression samples">
       <figcaption><b>表情采样：</b>ExpressionSampler 的 20 个语义类中的 6 类。表情基按区域分块（左眼 / 右眼 / 下半脸 / 舌头 / 瞳孔），牙齿和舌头随之运动。注意系数是<b>原始 PCA 系数</b>，各分量尺度差异很大（首分量 1.0 ≈ 8 mm 位移），这对拟合时的正则化很关键。</figcaption>
     </figure>
 
@@ -298,22 +298,22 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
       <p style="margin:0">PCA 基只回答"头能往哪些方向变"，对系数的取值没有约束：子空间里既有真人，也有大量不是人的线性组合。下面两组实验都只改系数、不改基，每列用同一种构造方式（σ 为各分量在采样器样本上的标准差，身份用 1,200 个样本、表情用 2,000 个样本估计）：<b>a：VAE 采样</b>（身份：female / asian；表情：happy）→ <b>b：VAE 采样</b>（身份：male / black；表情：surprise）→ <b>各维独立高斯 1σ</b>（indep. = independent，每个分量独立抽样，忽略分量间相关性）→ <b>各维独立高斯 3σ</b> → <b>外推 a + 4(a − b)</b>（extrapolate：从 b 经过 a 继续沿同一方向走 4 倍距离）→ <b>把 a 的分量随机打乱</b> → <b>所有分量同时 +2σ</b>。上排正面，下排侧面。</p>
     </div>
     <figure class="figure reveal">
-      <img src="assets/img/prior_identity_nonhuman.jpg?v=683cd86-20261112-1252" alt="non-human identity coefficients">
+      <img src="assets/img/prior_identity_nonhuman.jpg?v=1180723-20261112-1300" alt="non-human identity coefficients">
       <figcaption><b>身份（253 维）：</b>身份空间在 1–2σ 内相当宽容，独立高斯采样、分量打乱甚至全部 +2σ 都仍像人，说明头部形状的分布接近高斯；真正出问题的是<b>尺度</b>：3σ 已经失调，外推 a + 4(a − b) 得到塌陷的脸、移位的眼睛和巨大的耳朵。对身份而言，VAE 的价值主要在语义控制（指定人群 / 性别）和把样本限制在数据簇内。</figcaption>
     </figure>
     <figure class="figure reveal">
-      <img src="assets/img/prior_expression_nonhuman.jpg?v=683cd86-20261112-1252" alt="non-human expression coefficients">
+      <img src="assets/img/prior_expression_nonhuman.jpg?v=1180723-20261112-1300" alt="non-human expression coefficients">
       <figcaption><b>表情（383 维）：</b>差别大得多。独立高斯 1σ 已经出现不对称的撅嘴，3σ 时整张脸扭曲，外推得到肌肉上不可能同时出现的咧嘴 + 挤眼，全部 +2σ 则是鼓腮瞪眼。真实表情只占这个子空间里一条很薄的流形，且各分量尺度相差两个数量级（σ 从 0.015 到 1.16）。这正是重建时表情正则必须用采样器估计的逐分量 σ、而不能用统一尺度的原因。</figcaption>
     </figure>
 
     <div class="sub"><h3>骨骼、蒙皮与网格组件</h3><span class="pill amber">LBS</span></div>
     <div class="cards c2 reveal">
       <figure class="figure" style="margin:0">
-        <img src="assets/img/gnm_skinning_weights.jpg?v=683cd86-20261112-1252" alt="skinning weights">
+        <img src="assets/img/gnm_skinning_weights.jpg?v=1180723-20261112-1300" alt="skinning weights">
         <figcaption><b>蒙皮权重</b>（橙色 = 1，蓝色 = 0）：neck 关节带动颈部，head 关节带动整个头部，左右眼关节只控制眼球。重建时我们只优化 neck 关节的旋转作为头部姿态。</figcaption>
       </figure>
       <figure class="figure" style="margin:0">
-        <img src="assets/img/gnm_components.jpg?v=683cd86-20261112-1252" alt="mesh components">
+        <img src="assets/img/gnm_components.jpg?v=1180723-20261112-1300" alt="mesh components">
         <figcaption><b>网格组件</b>：皮肤（肤色）、左眼（绿）、右眼（蓝）、上牙龈（黄）、下牙龈（橙）、舌头（粉）。眼球分内层（巩膜/虹膜/瞳孔）与外层角膜，渲染时角膜默认剔除。</figcaption>
       </figure>
     </div>
@@ -321,15 +321,15 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
     <div class="sub"><h3>UV 布局与关键点定义</h3><span class="pill">UDIM</span></div>
     <div class="cards c3 reveal">
       <figure class="figure" style="margin:0">
-        <img src="assets/img/gnm_uv_edgeflow.jpg?v=683cd86-20261112-1252" alt="uv edgeflow">
+        <img src="assets/img/gnm_uv_edgeflow.jpg?v=1180723-20261112-1300" alt="uv edgeflow">
         <figcaption><b>皮肤 tile (1001)</b> 的 UV 展开（GNM 自带 4k edge-flow 图）。人脸位于中央，耳朵在两侧，顶部缺口为头顶接缝。</figcaption>
       </figure>
       <figure class="figure" style="margin:0">
-        <img src="assets/img/gnm_uv_udim.png?v=683cd86-20261112-1252" alt="udim tiles">
+        <img src="assets/img/gnm_uv_udim.png?v=1180723-20261112-1300" alt="udim tiles">
         <figcaption><b>UDIM 7 tile</b>：1001 皮肤、1002/1003 左眼内/外、1004/1005 右眼内/外、1006 牙齿牙龈、1007 舌头。每 tile 可用不同分辨率，纹理文件命名 <code>texture.&lt;UDIM&gt;.png</code>。</figcaption>
       </figure>
       <figure class="figure" style="margin:0">
-        <img src="assets/img/gnm_landmarks68.jpg?v=683cd86-20261112-1252" alt="68 landmarks">
+        <img src="assets/img/gnm_landmarks68.jpg?v=1180723-20261112-1300" alt="68 landmarks">
         <figcaption><b>68 关键点定义</b>：每个关键点由 3 个顶点的重心坐标给出，顺序与 iBUG-68 一致（0 下颌左、8 下巴、27–30 鼻梁、36/45 外眼角、48/54 嘴角），可直接与 FAN 检测结果对应。</figcaption>
       </figure>
     </div>
@@ -404,6 +404,25 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
       <p>GNM 表情系数是未归一化的 PCA 系数，不同分量的典型幅度相差两个数量级（先验 std 最小 0.015、中位 0.24、最大 1.2）。最初用库里的 <code>expression_sigmas</code> 做正则，结果所有表情被压到接近 0，嘴永远闭着（误差 7.5 px）。改用从 <code>ExpressionSampler</code> 的 20 类 × 200 个样本估计的逐分量 RMS 作为 σ 后，嘴型、露齿、挑眉都能被正确拟合，误差降到 4.3 px。这个 σ 只需估计一次并缓存。</p>
     </div>
 
+    <div class="sub"><h3>牙齿、舌头和眼睛是怎么处理的</h3><span class="pill violet">no direct observation</span></div>
+    <div class="cards c3 reveal">
+      <div class="card">
+        <h4>牙齿：形状取平均，运动由表情基联动</h4>
+        <p>牙齿形状由身份系数里的 80 个 <code>teeth_*</code> 分量控制，但 68 个关键点全在皮肤上，这些分量得不到数据梯度，只受 L2 正则约束，基本停在 0，即 GNM 的<b>平均牙齿</b>。牙齿的<b>运动不需要额外参数</b>：表情基覆盖全部 17,821 个顶点，<code>lower_face_region</code> 分量张嘴时同时移动下颌皮肤和下牙龈，上牙随 head 关节刚性运动。视频里张嘴能看到位置正确的牙齿，是表情基自带的联动。</p>
+      </div>
+      <div class="card">
+        <h4>舌头与瞳孔：固定为 0</h4>
+        <p>舌头由 32 个表情分量（<code>tongue_mean</code> + <code>tongue_000–030</code>）控制，瞳孔 1 个分量。单目关键点完全观测不到，拟合时这 33 维<b>固定为 0</b>：舌头保持平均姿态待在口腔里，瞳孔不动。眼球转动（left_eye / right_eye 关节）同样没有观测，保持正视。</p>
+      </div>
+      <div class="card">
+        <h4>纹理：从张嘴的帧里烘出来</h4>
+        <p>烘焙时牙齿 tile（1006）、舌头 tile（1007）和眼球 tile（1002 / 1004）与皮肤一样参与投影，深度测试只在它们露出来并朝向相机的帧里采样。Actor_24 的 11 段视频中，牙齿 tile 约 23%、舌头 26%、眼球内层约 53% 的纹素有真实观测，其余由 push-pull 填充。所以贴图渲染里牙齿和虹膜的<b>颜色是真人的，形状是平均的</b>。</p>
+      </div>
+    </div>
+    <div class="card reveal" style="margin-top:18px">
+      <p style="margin:0"><b>局限与改进方向：</b>牙齿大小、排列、咬合不个性化，张大嘴时偶尔出现牙齿轻微穿出或缩进嘴唇；舌头永远不动；视线固定。要改进需要口腔和眼部的直接观测：牙齿分割或牙齿轮廓关键点、虹膜检测，配合光度损失让牙齿身份分量、舌头分量和眼球关节有梯度；或者至少给舌头分量一个由语音 / 口型推断的先验。</p>
+    </div>
+
     <div class="sub"><h3>纹理烘焙</h3><span class="pill">UDIM bake</span></div>
     <div class="cards c2 reveal">
       <div class="card">
@@ -415,7 +434,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         </ol>
       </div>
       <figure class="figure" style="margin:0">
-        <img src="assets/img/tex_actor24_skin.jpg?v=683cd86-20261112-1252" alt="baked skin texture">
+        <img src="assets/img/tex_actor24_skin.jpg?v=1180723-20261112-1300" alt="baked skin texture">
         <figcaption>Actor_24 烘焙得到的皮肤 tile（1001）。约 53% 纹素有真实观测，其余由 push-pull 填充。眼睛、牙齿、舌头 tile 同样从张嘴帧中获得。</figcaption>
       </figure>
     </div>
@@ -454,7 +473,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
       <p class="muted" style="font-size:14px;margin:-6px 0 16px">样本命名 <code>V1-Song-Actor_24-000XX</code>：每段由同一（情绪，强度）组合的 4 条原始 RAVDESS 歌唱片段拼接而成（2 句歌词 × 2 次重复；已用原始文件时长逐段核对）。情绪编码见 RAVDESS 命名规则（01 中性、02 平静、03 高兴、04 悲伤、05 愤怒、06 恐惧），强度 01 常规 / 02 强。</p>
       <div class="cases">
       <div class="case">
-        <video controls preload="metadata" src="assets/video/actor24_00001_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/actor24_00001_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -466,7 +485,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         <div class="meta"><b>V1-Song-Actor_24-00001</b><span class="emo">中性 neutral</span><span>468 帧 · 4.22 px</span></div>
       </div>
       <div class="case">
-        <video controls preload="metadata" src="assets/video/actor24_00003_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/actor24_00003_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -478,7 +497,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         <div class="meta"><b>V1-Song-Actor_24-00003</b><span class="emo">平静 calm · 强</span><span>536 帧 · 5.49 px</span></div>
       </div>
       <div class="case">
-        <video controls preload="metadata" src="assets/video/actor24_00005_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/actor24_00005_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -490,7 +509,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         <div class="meta"><b>V1-Song-Actor_24-00005</b><span class="emo">高兴 happy · 强</span><span>484 帧 · 5.37 px</span></div>
       </div>
       <div class="case">
-        <video controls preload="metadata" src="assets/video/actor24_00007_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/actor24_00007_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -502,7 +521,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         <div class="meta"><b>V1-Song-Actor_24-00007</b><span class="emo">悲伤 sad · 强</span><span>504 帧 · 5.06 px</span></div>
       </div>
       <div class="case">
-        <video controls preload="metadata" src="assets/video/actor24_00009_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/actor24_00009_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -514,7 +533,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         <div class="meta"><b>V1-Song-Actor_24-00009</b><span class="emo">愤怒 angry · 强</span><span>440 帧 · 4.75 px</span></div>
       </div>
       <div class="case">
-        <video controls preload="metadata" src="assets/video/actor24_00011_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/actor24_00011_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -531,10 +550,10 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
           <canvas></canvas>
           <div class="loading">加载 3D 模型 …</div>
           <div class="hint">拖动旋转 · 滚轮缩放 · 右键平移</div>
-          <div class="vbar"><b>3D 模型 · 00003（平静 · 强）第 40 帧</b><button data-act="rotate" class="on">自动旋转</button><button data-act="tex" class="on">贴图</button><button data-act="wire">线框</button><a class="btn" href="assets/models/actor24_v03_f40.glb?v=683cd86-20261112-1252" download>下载 GLB</a></div>
+          <div class="vbar"><b>3D 模型 · 00003（平静 · 强）第 40 帧</b><button data-act="rotate" class="on">自动旋转</button><button data-act="tex" class="on">贴图</button><button data-act="wire">线框</button><a class="btn" href="assets/models/actor24_v03_f40.glb?v=1180723-20261112-1300" download>下载 GLB</a></div>
         </div>
         <figure class="figure" style="margin:0">
-          <img src="assets/img/tex_actor24_skin.jpg?v=683cd86-20261112-1252" alt="actor24 skin texture">
+          <img src="assets/img/tex_actor24_skin.jpg?v=1180723-20261112-1300" alt="actor24 skin texture">
           <figcaption>Actor_24 烘焙皮肤 tile（1001），2048²。11 段视频共同烘焙。</figcaption>
         </figure>
       </div>
@@ -570,7 +589,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
             </dl>
           </div>
           <figure class="figure" style="margin:0">
-            <img src="assets/img/tex_actor24_tiles.jpg?v=683cd86-20261112-1252" alt="actor24 tiles">
+            <img src="assets/img/tex_actor24_tiles.jpg?v=1180723-20261112-1300" alt="actor24 tiles">
             <figcaption>Actor_24 其余 tile：左眼内/外、右眼内/外、牙齿牙龈、舌头。</figcaption>
           </figure>
         </div>
@@ -580,7 +599,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
     <div class="tabpanel" id="tab-hdtf">
       <div class="cases">
       <div class="case">
-        <video controls preload="metadata" src="assets/video/hdtf_00338_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/hdtf_00338_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -592,7 +611,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         <div class="meta"><b>V4-00338</b><span>725 帧 · 3.86 px</span></div>
       </div>
       <div class="case">
-        <video controls preload="metadata" src="assets/video/hdtf_00282_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/hdtf_00282_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -604,7 +623,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         <div class="meta"><b>V4-00282</b><span>725 帧 · 4.26 px</span></div>
       </div>
       <div class="case">
-        <video controls preload="metadata" src="assets/video/hdtf_00286_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/hdtf_00286_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -616,7 +635,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         <div class="meta"><b>V4-00286 · 戴眼镜</b><span>625 帧 · 3.99 px</span></div>
       </div>
       <div class="case">
-        <video controls preload="metadata" src="assets/video/hdtf_00296_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/hdtf_00296_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -628,7 +647,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         <div class="meta"><b>V4-00296</b><span>950 帧 · 5.00 px</span></div>
       </div>
       <div class="case">
-        <video controls preload="metadata" src="assets/video/hdtf_00349_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/hdtf_00349_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -640,7 +659,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
         <div class="meta"><b>V4-00349 · 络腮胡</b><span>750 帧 · 4.12 px</span></div>
       </div>
       <div class="case">
-        <video controls preload="metadata" src="assets/video/hdtf_00025_6col.mp4?v=683cd86-20261112-1252"></video>
+        <video controls preload="metadata" src="assets/video/hdtf_00025_6col.mp4?v=1180723-20261112-1300"></video>
         <div class="labels">
           <div><b>源视频</b><span>source</span></div>
           <div><b>FAN 68 关键点</b><span>landmarks</span></div>
@@ -672,10 +691,10 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
           <canvas></canvas>
           <div class="loading">加载 3D 模型 …</div>
           <div class="hint">拖动旋转 · 滚轮缩放 · 右键平移</div>
-          <div class="vbar"><b>3D 模型 · V4-00349 第 375 帧</b><button data-act="rotate" class="on">自动旋转</button><button data-act="tex" class="on">贴图</button><button data-act="wire">线框</button><a class="btn" href="assets/models/hdtf_00349_f375.glb?v=683cd86-20261112-1252" download>下载 GLB</a></div>
+          <div class="vbar"><b>3D 模型 · V4-00349 第 375 帧</b><button data-act="rotate" class="on">自动旋转</button><button data-act="tex" class="on">贴图</button><button data-act="wire">线框</button><a class="btn" href="assets/models/hdtf_00349_f375.glb?v=1180723-20261112-1300" download>下载 GLB</a></div>
         </div>
           <figure class="figure" style="margin:0">
-            <img src="assets/img/tex_hdtf349_skin.jpg?v=683cd86-20261112-1252" alt="hdtf skin texture">
+            <img src="assets/img/tex_hdtf349_skin.jpg?v=1180723-20261112-1300" alt="hdtf skin texture">
             <figcaption>V4-00349 皮肤 tile。胡须与发际线被烘进皮肤贴图，后脑为填充色。</figcaption>
           </figure>
         </div>
@@ -729,7 +748,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
       <p>Ploumpis et al., <em>GNM Head: A Generative aNthropometric Model of the human head</em>, 2026. arXiv:2607.23687.<br>Bulat &amp; Tzimiropoulos, <em>How far are we from solving the 2D &amp; 3D Face Alignment problem?</em>, ICCV 2017 (FAN).<br>RAVDESS (Livingstone &amp; Russo, 2018)；HDTF (Zhang et al., CVPR 2021)。</p>
     </div>
   </div>
-  <div class="wrap" style="display:block;margin-top:22px;font-size:12px;color:var(--muted)">页面版本 build <span id="build">683cd86-20261112-1252</span>（若与 GitHub 最新提交不符，请强制刷新或使用无痕窗口）</div>
+  <div class="wrap" style="display:block;margin-top:22px;font-size:12px;color:var(--muted)">页面版本 build <span id="build">1180723-20261112-1300</span>（若与 GitHub 最新提交不符，请强制刷新或使用无痕窗口）</div>
 </footer>
 
 <div id="lb"><img alt=""></div>
@@ -756,8 +775,8 @@ secs.forEach(s => nio.observe(s));
 // only one demo video plays at a time
 document.querySelectorAll('.case video').forEach(v => v.addEventListener('play', () => document.querySelectorAll('.case video').forEach(o => { if (o !== v) o.pause(); })));
 </script>
-<script>window.ASSET_VER = '683cd86-20261112-1252';</script>
-<script src="assets/js/three-bundle.js?v=683cd86-20261112-1252"></script>
+<script>window.ASSET_VER = '1180723-20261112-1300';</script>
+<script src="assets/js/three-bundle.js?v=1180723-20261112-1300"></script>
 <script>
 // Interactive GLB viewer. Everything is loaded through plain <script> tags (no fetch / ES modules),
 // so the page also works when opened directly from file://.
