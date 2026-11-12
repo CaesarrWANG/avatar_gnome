@@ -295,7 +295,7 @@ footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
 
     <div class="sub"><h3>为什么还需要条件 VAE：PCA 子空间里的"非人"样本</h3><span class="pill amber">prior</span></div>
     <div class="card reveal" style="margin-bottom:18px">
-      <p style="margin:0">PCA 基只回答"头能往哪些方向变"，对系数的取值没有约束：子空间里既有真人，也有大量不是人的线性组合。下面两组实验都只改系数、不改基，每列用同一种构造方式（σ 为各分量在采样器样本上的标准差，身份用 1,200 个样本、表情用 2,000 个样本估计）：<b>VAE 采样</b> → <b>各维独立高斯 1σ</b> → <b>各维独立高斯 3σ</b> → <b>两个合法样本外推 a + 4(a − b)</b> → <b>把合法样本的分量随机打乱</b> → <b>所有分量同时 +2σ</b>。上排正面，下排侧面。</p>
+      <p style="margin:0">PCA 基只回答"头能往哪些方向变"，对系数的取值没有约束：子空间里既有真人，也有大量不是人的线性组合。下面两组实验都只改系数、不改基，每列用同一种构造方式（σ 为各分量在采样器样本上的标准差，身份用 1,200 个样本、表情用 2,000 个样本估计）：<b>a：VAE 采样</b>（身份：female / asian；表情：happy）→ <b>b：VAE 采样</b>（身份：male / black；表情：surprise）→ <b>各维独立高斯 1σ</b>（indep. = independent，每个分量独立抽样，忽略分量间相关性）→ <b>各维独立高斯 3σ</b> → <b>外推 a + 4(a − b)</b>（extrapolate：从 b 经过 a 继续沿同一方向走 4 倍距离）→ <b>把 a 的分量随机打乱</b> → <b>所有分量同时 +2σ</b>。上排正面，下排侧面。</p>
     </div>
     <figure class="figure reveal">
       <img src="assets/img/prior_identity_nonhuman.jpg" alt="non-human identity coefficients">
