@@ -207,7 +207,7 @@ th.num{font-family:var(--sans)}
       <li><a href="#align">对齐生成视频</a></li>
       <li><a href="#eyes">眼球</a></li>
       <li><a href="#teeth">牙齿</a></li>
-      <li><a href="#open">遗留问题</a></li>
+      <li><a href="#open">当前问题</a></li>
     </ul>
   </div>
 </nav>
@@ -237,7 +237,7 @@ th.num{font-family:var(--sans)}
 
     <div class="cases">
       <div class="case">
-        <video class="c4" controls preload="metadata" src="assets/tex/video/final_00009.mp4?v=a105dd1-20261119-1712"></video>
+        <video class="c4" controls preload="metadata" src="assets/tex/video/final_00009.mp4?v=7b5274d-20261119-1737"></video>
         <div class="labels n4">
           <div><b>源视频 + 478 关键点</b><span>RAVDESS 512²</span></div>
           <div><b>贴图网格叠加在视频上</b><span>overlay</span></div>
@@ -247,7 +247,7 @@ th.num{font-family:var(--sans)}
         <div class="meta"><b>V1-Song-Actor_24-00009</b><span class="emo">愤怒 · 强</span><span>439 帧 · 带音轨</span></div>
       </div>
       <div class="case">
-        <video class="c4" controls preload="metadata" src="assets/tex/video/final_00006.mp4?v=a105dd1-20261119-1712"></video>
+        <video class="c4" controls preload="metadata" src="assets/tex/video/final_00006.mp4?v=7b5274d-20261119-1737"></video>
         <div class="labels n4">
           <div><b>源视频 + 478 关键点</b><span>RAVDESS 512²</span></div>
           <div><b>贴图网格叠加在视频上</b><span>overlay</span></div>
@@ -275,6 +275,7 @@ th.num{font-family:var(--sans)}
           <li>眼周偏暗（眼下亮度比原视频低约 15%），有黑眼圈感。</li>
           <li>牙齿是没有细节的平色；牙列形状是模型自带的，与本人不同。</li>
           <li>头发只是贴在光头网格上的一层图案，没有体积。</li>
+          <li>只在一个人身上验证过。完整清单见<a href="#open">第 6 节</a>。</li>
         </ul>
       </div>
       <div class="card">
@@ -310,7 +311,7 @@ th.num{font-family:var(--sans)}
     </div>
 
     <div class="case" style="margin-bottom:26px">
-      <video class="c5x2" controls preload="metadata" src="assets/tex/video/routes_00009.mp4?v=a105dd1-20261119-1712"></video>
+      <video class="c5x2" controls preload="metadata" src="assets/tex/video/routes_00009.mp4?v=7b5274d-20261119-1737"></video>
       <div class="labels n5">
         <div><b>源视频</b><span>source</span></div>
         <div><b>1 · Hunyuan3D-2 Paint</b><span>texture_hy3d</span></div>
@@ -322,11 +323,11 @@ th.num{font-family:var(--sans)}
     </div>
 
     <figure class="figure">
-      <img src="assets/tex/img/turntable_routes.jpg?v=a105dd1-20261119-1712" alt="turntable of five textures">
+      <img src="assets/tex/img/turntable_routes.jpg?v=7b5274d-20261119-1737" alt="turntable of five textures">
       <figcaption><b>8 个视角一圈。</b>从上到下：0 视频直接烘焙、1 Hunyuan3D-2 Paint、2 环绕视频反投影（光流对齐后）、3 混合、4 生成式重绘 v9。基线在背面是空的；Hunyuan 的背面是纯色；后三行背面有头发。</figcaption>
     </figure>
     <figure class="figure">
-      <img src="assets/tex/img/uv_routes.jpg?v=a105dd1-20261119-1712" alt="skin UV tile of five textures">
+      <img src="assets/tex/img/uv_routes.jpg?v=7b5274d-20261119-1737" alt="skin UV tile of five textures">
       <figcaption><b>皮肤贴图（UDIM 1001）。</b>顺序同上，从左到右。五张图是同一套 UV，所以可以直接互换使用。</figcaption>
     </figure>
 
@@ -354,7 +355,7 @@ th.num{font-family:var(--sans)}
       </table>
     </div>
     <figure class="figure" style="margin-top:22px">
-      <img src="assets/tex/img/crown_v3_vs_v2.jpg?v=a105dd1-20261119-1712" alt="crown repair">
+      <img src="assets/tex/img/crown_v3_vs_v2.jpg?v=7b5274d-20261119-1737" alt="crown repair">
       <figcaption><b>头顶修补。</b>上行 v3，下行 v2；俯视 45° 和 80°，前后各一。水平环绕的视频看不到头顶，所以单独渲染。</figcaption>
     </figure>
   </div>
@@ -370,7 +371,7 @@ th.num{font-family:var(--sans)}
     </div>
 
     <div class="case" style="margin-bottom:26px;max-width:860px">
-      <video class="c2" controls preload="metadata" src="assets/tex/video/depth_vs_generated.mp4?v=a105dd1-20261119-1712"></video>
+      <video class="c2" controls preload="metadata" src="assets/tex/video/depth_vs_generated.mp4?v=7b5274d-20261119-1737"></video>
       <div class="labels n2">
         <div><b>条件：深度环绕视频（闭嘴中性表情）</b><span>depth · 440 f @ 25 fps</span></div>
         <div><b>生成结果</b><span>generated · 361 f @ 24 fps</span></div>
@@ -434,7 +435,7 @@ th.num{font-family:var(--sans)}
     </div>
 
     <figure class="figure" style="margin-top:26px">
-      <img src="assets/tex/img/flow_before_after.jpg?v=a105dd1-20261119-1712" alt="optical flow alignment before and after">
+      <img src="assets/tex/img/flow_before_after.jpg?v=7b5274d-20261119-1737" alt="optical flow alignment before and after">
       <figcaption><b>光流对齐前后。</b>上行对齐前（只有位姿和关键点），下行对齐后。侧面和背面的发丝、耳朵轮廓明显变清晰。注意：清晰不等于正确，头发本来有厚度，光流只是把各视角对到了一个共识上，仍然是贴在头皮上的一层。</figcaption>
     </figure>
   </div>
@@ -461,7 +462,7 @@ th.num{font-family:var(--sans)}
       </table>
     </div>
     <figure class="figure">
-      <img src="assets/tex/img/eye_uv_check.jpg?v=a105dd1-20261119-1712" alt="eye texture check v4 v5 v7">
+      <img src="assets/tex/img/eye_uv_check.jpg?v=7b5274d-20261119-1737" alt="eye texture check v4 v5 v7">
       <figcaption><b>右眼贴图的核对，从左到右 v4、v5、v7。</b>绿色是模型的虹膜和瞳孔范围，红色是贴图里画的。</figcaption>
     </figure>
 
@@ -501,7 +502,7 @@ th.num{font-family:var(--sans)}
       </div>
     </div>
     <figure class="figure" style="margin-top:22px">
-      <img src="assets/tex/img/gaze_compare.jpg?v=a105dd1-20261119-1712" alt="gaze with and without eye rotation">
+      <img src="assets/tex/img/gaze_compare.jpg?v=7b5274d-20261119-1737" alt="gaze with and without eye rotation">
       <figcaption><b>片段 00003 的三帧。</b>左：源视频；中：眼球固定；右：加上眼球转动。这一段头略微后仰，不加转动时瞳孔顶在上眼睑下面，只露出一半。</figcaption>
     </figure>
     <div class="note">拟合后仍剩约 3 px 误差：网格上两个瞳孔的间距比检测到的宽约 5%（107 对 101 px），两眼共用视线角时这个差补不掉。上下方向的绝对值没有真值可以验证。</div>
@@ -522,7 +523,7 @@ th.num{font-family:var(--sans)}
       </div>
     </div>
     <figure class="figure" style="margin-top:22px">
-      <img src="assets/tex/img/eye_colour_highlight.jpg?v=a105dd1-20261119-1712" alt="eye colour and highlight progression">
+      <img src="assets/tex/img/eye_colour_highlight.jpg?v=7b5274d-20261119-1737" alt="eye colour and highlight progression">
       <figcaption><b>眼球从 v7 到最终效果，两帧。</b>从左到右：源视频、v7、v8、v9、v9 + 高光。</figcaption>
     </figure>
 
@@ -538,7 +539,7 @@ th.num{font-family:var(--sans)}
       </table>
     </div>
     <figure class="figure">
-      <img src="assets/tex/img/eye_geometry_before_after.jpg?v=a105dd1-20261119-1712" alt="eye geometry diagnosis before and after">
+      <img src="assets/tex/img/eye_geometry_before_after.jpg?v=7b5274d-20261119-1737" alt="eye geometry diagnosis before and after">
       <figcaption><b>四个核对帧。</b>左：源视频；中：修正前（v9 + 转动 + 高光）；右：修正眼周几何和遮挡之后。第三行是闭眼帧。</figcaption>
     </figure>
     <div class="note">这一轮只在一段视频的四帧上人工核对过，没有逐帧审阅；新的眼球身份系数还没有在其他片段上验证；修正后的参数没有并入上面的结果视频。</div>
@@ -574,7 +575,7 @@ th.num{font-family:var(--sans)}
       </div>
     </div>
     <figure class="figure" style="margin-top:22px">
-      <img src="assets/tex/img/teeth_compare.jpg?v=a105dd1-20261119-1712" alt="teeth comparison">
+      <img src="assets/tex/img/teeth_compare.jpg?v=7b5274d-20261119-1737" alt="teeth comparison">
       <figcaption><b>三帧（张大嘴、露齿、微张）。</b>从左到右：源视频、重新调色、v9、v3。重新调色的版本还没有用在上面的结果视频里。</figcaption>
     </figure>
   </div>
@@ -585,11 +586,73 @@ th.num{font-family:var(--sans)}
   <div class="wrap">
     <div class="sec-head">
       <div class="num">06</div>
-      <div><h2>遗留问题与下一步</h2>
-      <p>把最终贴图 v9 与原视频同帧比较，脸颊亮度完全一致，差距集中在眼周和整体色调。</p></div>
+      <div><h2>当前存在的问题与下一步</h2>
+      <p>按影响大小分成五类。前两类直接决定“像不像本人”，是目前最主要的差距；后面几类是方法本身的限制和验证上的缺口。</p></div>
     </div>
+
+    <div class="sub" style="margin-top:0"><h3>A · 身份相似度：贴图</h3></div>
+    <div class="table-wrap" style="margin-bottom:22px">
+      <table>
+        <tr><th style="width:26%">问题</th><th>表现与依据</th><th style="width:22%">状态</th></tr>
+        <tr><td><b>正脸不是真实像素</b></td><td>最终贴图 v9 的五官是生成式重绘的。并排看比本人更瘦削、年龄感偏大，眉毛更浓更直，嘴唇更薄更淡。</td><td><span class="verdict bad">未解决</span> 需把视频真实像素融进 v9</td></tr>
+        <tr><td><b>眼周偏暗</b></td><td>眼下亮度 135，原视频 159（低约 15%）；眼眶一圈画了阴影，眼睛显得凹陷。</td><td><span class="verdict bad">未解决</span></td></tr>
+        <tr><td><b>下眼睑细节不同</b></td><td>睫毛、静态褶皱与本人不一致。只换贴图的对照支持“贴图也有贡献”，但没有可靠的真实贴图作真值。</td><td><span class="verdict bad">未解决</span></td></tr>
+        <tr><td><b>肤色和明暗</b></td><td>整体略偏黄（“红减蓝”高约 10）；额头偏暗、下巴偏亮，在不带光照的渲染下脸显得平。</td><td><span class="verdict mid">影响小</span></td></tr>
+        <tr><td><b>贴图不是原生 2K</b></td><td>重绘贴图原生 1254²，放大到 2048²；真实像素来源只有 512² 的视频，脸宽约 250 px。</td><td><span class="verdict mid">受数据限制</span></td></tr>
+      </table>
+    </div>
+
+    <div class="sub"><h3>B · 身份相似度：几何</h3></div>
+    <div class="table-wrap" style="margin-bottom:22px">
+      <table>
+        <tr><th style="width:26%">问题</th><th>表现与依据</th><th style="width:22%">状态</th></tr>
+        <tr><td><b>眼裂形状有偏差</b></td><td>睁眼时网格眼裂的可见面积比检测多边形小 12–18%，位置和形状也不同。</td><td><span class="verdict mid">修了一段</span> 仅 00006，未并入结果视频</td></tr>
+        <tr><td><b>两眼间距偏宽</b></td><td>网格瞳距 107 px，检测 101 px（宽约 5%）；视线拟合后因此仍剩约 3 px 误差，两眼略显外分。</td><td><span class="verdict bad">未解决</span></td></tr>
+        <tr><td><b>眼球没有填满眼裂</b></td><td>一只眼的下外侧，眼白和下眼睑之间露出一小条眼窝内壁的颜色。</td><td><span class="verdict bad">未解决</span></td></tr>
+        <tr><td><b>嘴唇合不拢</b></td><td>闭嘴时上下唇之间留一条缝，露出口腔内部，表现为唇缝处的一条暗线。</td><td><span class="verdict bad">未解决</span></td></tr>
+        <tr><td><b>牙列是模型自带的</b></td><td>张大嘴时模型上下两排牙完整露出；原视频只看得到上门牙和一点下牙。</td><td><span class="verdict mid">模型限制</span></td></tr>
+        <tr><td><b>视线的绝对值无法验证</b></td><td>上下方向在多段视频里平均“向下”9–16°，与头部俯仰互补，趋势合理，但是否有固定偏差没有真值可比。</td><td><span class="verdict mid">待验证</span></td></tr>
+      </table>
+    </div>
+
+    <div class="sub"><h3>C · 眼睛、口腔的观感</h3></div>
+    <div class="table-wrap" style="margin-bottom:22px">
+      <table>
+        <tr><th style="width:26%">问题</th><th>表现与依据</th><th style="width:22%">状态</th></tr>
+        <tr><td><b>虹膜像同心色环</b></td><td>512² 渲染下虹膜直径只有十几个像素，贴图里的放射纹理看不出来，只剩瞳孔、深色环、浅色环三层。</td><td><span class="verdict mid">受分辨率限制</span></td></tr>
+        <tr><td><b>牙齿是平色</b></td><td>v9 的牙亮度正确（142 对原视频 137）但没有任何明暗。重新调色的版本有细节，个别牙面带黄褐色斑块。</td><td><span class="verdict mid">有修正版</span> 未并入结果视频</td></tr>
+        <tr><td><b>口腔内看不出舌头</b></td><td>舌头亮度与原视频接近（42 对 33），但没有明暗，和口腔内壁融成一片。</td><td><span class="verdict mid">影响小</span></td></tr>
+        <tr><td><b>高光是近似</b></td><td>单一固定光源；GNM 的角膜鼓出约 1.6 mm，比真人平，反光点随视线的移动偏小；没有模拟角膜折射。</td><td><span class="verdict mid">够用</span></td></tr>
+      </table>
+    </div>
+
+    <div class="sub"><h3>D · 方法本身的限制</h3></div>
+    <div class="table-wrap" style="margin-bottom:22px">
+      <table>
+        <tr><th style="width:26%">问题</th><th>表现与依据</th><th style="width:22%">状态</th></tr>
+        <tr><td><b>头发没有体积</b></td><td>发丝画在光头网格上：头型轮廓比真人小一圈，翘起的发梢和耳边碎发全部丢失，侧面看是平的。</td><td><span class="verdict bad">贴图方案做不到</span></td></tr>
+        <tr><td><b>渲染不带光照</b></td><td>贴图直接显示，没有阴影和高光（眼睛除外），立体感弱；任何画进贴图的明暗都不会随姿态变化。</td><td><span class="verdict mid">设计如此</span></td></tr>
+        <tr><td><b>生成模型不听条件</b></td><td>视频生成模型会改嘴型、重新定时、转角滞后；需要三步对齐来补救，结果不能精确复现。</td><td><span class="verdict mid">已绕过</span></td></tr>
+        <tr><td><b>侧面和背面只是“对到共识”</b></td><td>没有人脸的 280 帧位姿靠帧号插值，再用光流互相对齐。贴图清晰了，但没有任何东西保证它正确。</td><td><span class="verdict mid">原理限制</span></td></tr>
+        <tr><td><b>看不见的地方靠填充</b></td><td>路线 2 的皮肤贴图约 87% 的像素被直接观测到，头顶、下巴底、领口下沿是自动填充的；衣领正中有一条拖影。</td><td><span class="verdict mid">v9 已无此问题</span></td></tr>
+      </table>
+    </div>
+
+    <div class="sub"><h3>E · 验证上的缺口</h3></div>
+    <div class="table-wrap" style="margin-bottom:30px">
+      <table>
+        <tr><th style="width:26%">问题</th><th>说明</th><th style="width:22%">状态</th></tr>
+        <tr><td><b>只在一个人身上做过</b></td><td>全部实验都是 RAVDESS Actor_24。稠密点拟合、纹理路线、眼球转动都没有在 HDTF 或其他人身上验证。</td><td><span class="verdict bad">缺</span></td></tr>
+        <tr><td><b>没有身份相似度的定量指标</b></td><td>“像不像本人”目前全靠并排目视。清晰度（平均梯度）只说明锐利程度，不说明正确与否。</td><td><span class="verdict bad">缺</span></td></tr>
+        <tr><td><b>没有三维真值</b></td><td>所有误差都是相对检测关键点而言；两种检测器之间本身就相差约 2.5 px。</td><td><span class="verdict mid">数据限制</span></td></tr>
+        <tr><td><b>检查靠抽帧</b></td><td>除了黑帧扫描是逐帧的，其余结论都来自每段几帧的人工查看，没有逐帧审阅。</td><td><span class="verdict mid">部分自动化</span></td></tr>
+        <tr><td><b>修正没有汇总到一起</b></td><td>眼周几何修正、眼球身份系数、重新调色的牙齿各自独立存在，都没有并入最终结果视频；眼球身份系数只在一段视频上拟合过。</td><td><span class="verdict mid">待合并</span></td></tr>
+      </table>
+    </div>
+
+    <div class="sub"><h3>v9 与原视频的同帧对比</h3></div>
     <figure class="figure">
-      <img src="assets/tex/img/v9_vs_source.jpg?v=a105dd1-20261119-1712" alt="v9 against source frames">
+      <img src="assets/tex/img/v9_vs_source.jpg?v=7b5274d-20261119-1737" alt="v9 against source frames">
       <figcaption><b>三个表情，每组左为源视频、右为 v9 渲染（带眼球转动和高光）。</b></figcaption>
     </figure>
     <div class="cards c2">
@@ -614,6 +677,7 @@ th.num{font-family:var(--sans)}
           <li><b>身份</b>：在 v9 这张干净的贴图上融合视频的真实正脸像素，而不是在反投影的贴图上融合。</li>
           <li><b>两眼间距</b>：网格瞳距比检测宽 5%，需要调整眼球位置或加固定内收角。</li>
           <li><b>头发体积</b>：贴图方案的固有限制。方向是皮肤用 UV、头发单独用绑定在头部关节上的 3D 高斯。</li>
+          <li><b>验证</b>：加一个身份相似度指标；把现有修正合并后在第二个人身上完整跑一遍。</li>
         </ol>
       </div>
     </div>
@@ -650,7 +714,7 @@ th.num{font-family:var(--sans)}
       <p>GNM Head（Google）；MediaPipe Face Landmarker；Hunyuan3D-2 Paint（腾讯）；Seedance 视频生成；图像生成模型用于 UV 重绘。</p>
     </div>
   </div>
-  <div class="wrap" style="display:block;margin-top:22px;font-size:12px;color:var(--muted)">页面版本 build <span id="build">a105dd1-20261119-1712</span></div>
+  <div class="wrap" style="display:block;margin-top:22px;font-size:12px;color:var(--muted)">页面版本 build <span id="build">7b5274d-20261119-1737</span></div>
 </footer>
 
 <div id="lb"><img alt=""></div>
