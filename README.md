@@ -12,10 +12,17 @@
 - **重建方法** — FAN 68 点关键点 → 两阶段 Adam 联合优化（共享身份与焦距，逐帧表情/姿态，采样器先验 + 时域平滑）→ 全网格导出 → 纹理烘焙（深度可见性 + cos⁴ 加权 + push-pull 补洞）。
 - **结果演示** — RAVDESS Actor_24 11 段（5,276 帧，4.96 px）与 HDTF 6 段（4,475 帧，4.31 px）的六列对比视频（含音轨）、可交互的贴图 3D 模型、纹理 tile 与定量表格。
 
+## 进展记录（独立页面）
+
+`texture.html` 记录主报告之后的工作，内容不与主报告混排：四条全头纹理路线的对比（Hunyuan3D-2 Paint、生成环绕视频反投影、真实像素混合、生成式重绘 UV）、把生成视频对齐到网格（逐帧位姿、关键点扭正、光流精修）、眼球贴图规范与逐帧眼球转动、渲染时计算的眼部高光、牙齿调色，以及遗留问题。
+在线地址：https://caesarrwang.github.io/avatar_gnome/texture.html
+它的素材单独放在 `assets/tex/`，由工作目录的 `scripts/make_texture_page_assets.py` 与 `scripts/make_texture_page_videos.sh` 生成。
+
 ## 目录
 
 ```
-index.html            报告页面
+index.html            主报告页面
+texture.html          进展记录页面（纹理 / 眼球 / 高光），素材在 assets/tex/
 assets/img/           图表（GNM 可视化、流程分解、纹理）
 assets/models/        可交互 3D 模型（GLB + 同名 .glb.js base64 数据脚本，three.js 加载）
 assets/js/            自托管 three.js r160 打包（three-bundle.js）
